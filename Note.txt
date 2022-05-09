@@ -1,0 +1,22 @@
+个股成交量前后10名
+个股涨跌数量 分板 分市值
+
+怎么分析出有价值的个股，3倍股
+
+自选股个股研报下载
+
+研报列表增加已读，删除清理，和加精
+____________
+
+https://github.com/uname-yang/pysnowball
+https://tushare.pro/document/2?doc_id=27
+
+https://reportapi.eastmoney.com/report/org
+http://reportapi.eastmoney.com/report/list?beginTime=2019-06-17&endTime=2021-06-17&fields=orgCode,orgSName,sRatingName,encodeUrl,title,publishDate,market&pageNo=1&pageSize=5&qType=0&code=300059&cb=callback2611876&_=1623943523928
+qType{
+    0: 个股研报
+    1: 行业研报
+    2: 策略报告
+    3: 宏观点评
+    4: 券商晨报
+}
