@@ -10,10 +10,16 @@ import tushare as ts
 from AnalyzeData import AnalyzeData
 from DataUpgrade import DataUpgrade
 from Utils import Utils
+from configparser import ConfigParser
 
 if __name__ == '__main__':
-    ball.set_token('xq_a_token=773e2b1aa13013252cba4bc4922519d585dc3955;')
-    pro = ts.pro_api("e138f79884f8fa15e980bf3cceea0b66975d877e91dcc4ffae44d194")
+    config = ConfigParser()
+    config.read('token.config')
+
+    ball.set_token(config.get('token', 'xueqiu'))  # xq_a_token=XXXX
+    pro = ts.pro_api(config.get('token', 'tushare'))
+
+    date = time.strftime("%Y-%m-%d", time.localtime())
 
     # print(json.dumps(ball.quotec('BK0744'), sort_keys=True, ensure_ascii=False, indent=4, separators=(',', ':')))
     # print(json.dumps(ball.watch_list(), sort_keys=True, ensure_ascii=False, indent=4, separators=(',', ':')))
@@ -32,3 +38,6 @@ if __name__ == '__main__':
     # DataUpgrade.updateStocks(pro)
 
     AnalyzeData.get_report(AnalyzeData.get_url(3), 3)  # 宏观
+
+    print("### 西藏旅游股东人数")
+    print(pro.stk_holdernumber(ts_code='600749.SH', start_date='20180101', end_date=date))
