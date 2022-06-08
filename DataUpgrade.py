@@ -16,10 +16,15 @@ class DataUpgrade:
     @staticmethod
     def updateBK(ball):
 
-        # os.rename(
-        #     os.path.join(os.getcwd(), 'data/bk.csv'),
-        #     os.path.join(os.getcwd(), 'data/bk_old.csv')
-        # )
+        bk_path = os.path.join(os.getcwd(), 'data/bk.csv')
+        bk_old_path = os.path.join(os.getcwd(), 'data/bk_old.csv')
+        if os.path.exists(bk_path):
+            if os.path.exists(bk_old_path):
+                os.remove(bk_old_path)
+            os.rename(
+                bk_path,
+                bk_old_path
+            )
 
         bk_table = pd.DataFrame(columns=['code', 'name', 'price', 'date', 'stock_count', 'market_capital', 'region'])
 
