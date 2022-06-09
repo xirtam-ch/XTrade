@@ -153,7 +153,7 @@ if __name__ == '__main__':
     ## 个股涨跌
 
     st.write("")
-    df_stocks_today = Utils.readCSVFromCache("today_stocks")
+    df_stocks_today = Utils.readCSVFromCache("today_stocks_" + date)
 
     today_up = df_stocks_today[df_stocks_today.percent > 0].shape[0]
     today_same = df_stocks_today[df_stocks_today.percent == 0].shape[0]
