@@ -77,7 +77,7 @@ class AnalyzeData:
 
         # print(json.dumps(data, sort_keys=True, ensure_ascii=False, indent=4, separators=(',', ':')))
 
-        if True:  # test code
+        if False:  # test code
             bk_table = Utils.readCSVFromCache('today_stocks')
         else:
             for i in range(0, group + 1):
@@ -85,15 +85,11 @@ class AnalyzeData:
                 for item in data['data']:
                     bk_table = bk_table.append({
                         'code': item['symbol'],
-                        'name': bk_keys.loc[
-                            Utils.B2Tcode(item['symbol'])
-                        ]['name'],
+                        'name': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + item['symbol'] + "\">" +
+                                bk_keys.loc[Utils.B2Tcode(item['symbol'])]['name'] + "</a>",
                         'amount': item['amount'],
                         'percent': item['percent'],
                         'current_year_percent': item['current_year_percent'],
-                        'site': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + item['symbol'] + "\">" +
-                                item[
-                                    'symbol'] + "</a>",
                     }, ignore_index=True)
             Utils.saveCSVToCache(bk_table, 'today_stocks')
 
@@ -102,34 +98,34 @@ class AnalyzeData:
             headAndTail).reset_index()
         # head_table['site'] = head_table.apply(lambda x: "https://xueqiu.com/S/" + x.code, axis=1)
         # head_table['site'] = "https://xueqiu.com/S/" + head_table['code']
-        head_table = head_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
+        head_table = head_table.loc[:, ['name', 'percent', 'current_year_percent']]
 
         print("今日跌幅前10")
         tail_table = bk_table[bk_table.percent < 0].sort_values('percent').head(
             headAndTail).reset_index()
 
-        tail_table = tail_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
+        tail_table = tail_table.loc[:, ['name', 'percent', 'current_year_percent']]
 
         print("今日成交额前10")
         amount_head_table = bk_table[bk_table.amount > 0].sort_values('amount', ascending=False).head(
             headAndTail).reset_index()
-        amount_head_table = amount_head_table.loc[:, ['name', 'amount', 'percent', 'current_year_percent', 'site']]
+        amount_head_table = amount_head_table.loc[:, ['name', 'amount', 'percent', 'current_year_percent']]
 
         print("今日成交额后10")
         amount_tail_table = bk_table[bk_table.amount > 0].sort_values('amount').head(
             headAndTail).reset_index()
-        amount_tail_table = amount_tail_table.loc[:, ['name', 'amount', 'percent', 'current_year_percent', 'site']]
+        amount_tail_table = amount_tail_table.loc[:, ['name', 'amount', 'percent', 'current_year_percent']]
 
         print("今年涨幅幅前10")
         year_head_table = bk_table[bk_table.current_year_percent > 0].sort_values('current_year_percent',
                                                                                   ascending=False).head(
             headAndTail).reset_index()
-        year_head_table = year_head_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
+        year_head_table = year_head_table.loc[:, ['name', 'percent', 'current_year_percent']]
 
         print("今年跌幅前10")
         year_tail_table = bk_table[bk_table.current_year_percent < 0].sort_values('current_year_percent').head(
             headAndTail).reset_index()
-        year_tail_table = year_tail_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
+        year_tail_table = year_tail_table.loc[:, ['name', 'percent', 'current_year_percent']]
 
         return head_table, tail_table, amount_head_table, amount_tail_table, year_head_table, year_tail_table
 
@@ -154,7 +150,7 @@ class AnalyzeData:
                 flow = flows['data']
                 bk_table = bk_table.append({
                     'code': code,
-                    'name': name,
+                    'name': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + name + "\">site</a>",
                     'percent': item['percent'],
                     'current_year_percent': item['current_year_percent'],
                     'buy_large': Utils.divFormat(flow['buy_large'], flow['buy_total']),
@@ -166,7 +162,6 @@ class AnalyzeData:
                     'small': Utils.divFormat(Utils.minusFormat(flow['buy_small'], flow['sell_small']),
                                              Utils.minusFormat(flow['buy_total'], flow['sell_total'])),
                     '': Utils.divFormat(flow['sell_small'], flow['sell_total']),
-                    'site': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + code + "\">site</a>",
                 }, ignore_index=True)
 
         Utils.saveCSVToCache(bk_table, 'today_flow')
@@ -187,10 +182,10 @@ class AnalyzeData:
         tail_table_layge = bk_table[bk_table.percent < 0].sort_values('sell_large', ascending=False).head(
             headAndTail).reset_index()
 
-        return head_table.loc[:, ['name', 'large', 'percent', 'current_year_percent', 'site']], \
-               tail_table.loc[:, ['name', 'large', 'percent', 'current_year_percent', 'site']], \
-               head_table_layge.loc[:, ['name', 'buy_large', 'percent', 'current_year_percent', 'site']], \
-               tail_table_layge.loc[:, ['name', 'sell_large', 'percent', 'current_year_percent', 'site']]
+        return head_table.loc[:, ['name', 'large', 'percent', 'current_year_percent']], \
+               tail_table.loc[:, ['name', 'large', 'percent', 'current_year_percent']], \
+               head_table_layge.loc[:, ['name', 'buy_large', 'percent', 'current_year_percent']], \
+               tail_table_layge.loc[:, ['name', 'sell_large', 'percent', 'current_year_percent']]
 
     @staticmethod
     def getBKs(ball):
@@ -234,11 +229,10 @@ class AnalyzeData:
             for item in data['data']:
                 bk_table = bk_table.append({
                     'code': item['symbol'],
-                    'name': bk_keys.loc[item['symbol']]['name'],
+                    'name': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + item['symbol'] + "\">" +
+                            bk_keys.loc[item['symbol']]['name'] + "</a>",
                     'percent': item['percent'],
                     'current_year_percent': item['current_year_percent'],
-                    'site': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + item['symbol'] + "\">" + item[
-                        'symbol'] + "</a>",
                 }, ignore_index=True)
 
         Utils.saveCSVToCache(bk_table, 'today_bk')
@@ -246,23 +240,23 @@ class AnalyzeData:
         print("今日涨幅前10板块")
         head_table = bk_table[bk_table.percent > 0].sort_values('percent', ascending=False).head(
             headAndTail).reset_index()
-        head_table = head_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
+        head_table = head_table.loc[:, ['name', 'percent', 'current_year_percent']]
 
         print("今日跌幅前10板块")
         tail_table = bk_table[bk_table.percent < 0].sort_values('percent').head(
             headAndTail).reset_index()
-        tail_table = tail_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
+        tail_table = tail_table.loc[:, ['name', 'percent', 'current_year_percent']]
 
         print("今年涨幅幅前10板块")
         year_head_table = bk_table[bk_table.current_year_percent > 0].sort_values('current_year_percent',
                                                                                   ascending=False).head(
             headAndTail).reset_index()
-        year_head_table = year_head_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
+        year_head_table = year_head_table.loc[:, ['name', 'percent', 'current_year_percent']]
 
         print("今年跌幅前10板块")
         year_tail_table = bk_table[bk_table.current_year_percent < 0].sort_values('current_year_percent').head(
             headAndTail).reset_index()
-        year_tail_table = year_tail_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
+        year_tail_table = year_tail_table.loc[:, ['name', 'percent', 'current_year_percent']]
 
         return head_table, tail_table, year_head_table, year_tail_table
 
