@@ -37,7 +37,9 @@ if __name__ == '__main__':
     # DataUpgrade.updateBK(ball)
     # DataUpgrade.updateStocks(pro)
 
-    AnalyzeData.get_report(AnalyzeData.get_url(3), 3)  # 宏观
+    print(ball.quote_detail('BK0001'))
 
-    print("### 西藏旅游股东人数")
-    print(pro.stk_holdernumber(ts_code='600749.SH', start_date='20180101', end_date=date))
+    # AnalyzeData.get_report(AnalyzeData.get_url(3), 3)  # 宏观
+    #
+    # print("### 西藏旅游股东人数")
+    # print(pro.stk_holdernumber(ts_code='600749.SH', start_date='20180101', end_date=date))
