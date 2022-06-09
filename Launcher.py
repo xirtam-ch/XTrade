@@ -82,6 +82,7 @@ if __name__ == '__main__':
 
     st.write(dfs[1].to_html(escape=False, index=False), unsafe_allow_html=True)
 
+    st.write("")
     st.markdown("### 今年涨幅前10板块:")
 
     add_color(dfs[2], 'percent')
@@ -102,7 +103,7 @@ if __name__ == '__main__':
     df_stocks = AnalyzeData.getStocks(ball)
 
     st.write("")
-    st.markdown("### 今日涨幅前10个股:")
+    st.markdown("### 今日涨幅前10个股(所有个股数据排除ST，下同):")
 
     add_color(df_stocks[0], 'percent')
     add_color(df_stocks[0], 'current_year_percent')
@@ -124,8 +125,9 @@ if __name__ == '__main__':
     add_color(df_stocks[2], 'current_year_percent')
     str_big_number(df_stocks[2], 'amount')
     st.write(df_stocks[2].to_html(escape=False, index=False), unsafe_allow_html=True)
+
     st.write("")
-    st.markdown("### 今日成交额后10个股:")
+    st.markdown("### 今日成交额后10个股(排除北交所):")
 
     add_color(df_stocks[3], 'percent')
     add_color(df_stocks[3], 'current_year_percent')

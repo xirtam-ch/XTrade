@@ -93,6 +93,9 @@ class AnalyzeData:
                     }, ignore_index=True)
             Utils.saveCSVToCache(bk_table, 'today_stocks')
 
+        # 排除ST
+        bk_table = bk_table[~(bk_table.name.str.contains('ST'))]
+
         print("今日涨幅前10")
         head_table = bk_table[bk_table.percent > 0].sort_values('percent', ascending=False).head(
             headAndTail).reset_index()
