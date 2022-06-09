@@ -19,6 +19,8 @@ class AnalyzeData:
     @staticmethod
     def getStocks(ball):
 
+        date = time.strftime("%Y-%m-%d", time.localtime())
+
         groupLength = 300
         headAndTail = 10
 
@@ -78,7 +80,7 @@ class AnalyzeData:
         # print(json.dumps(data, sort_keys=True, ensure_ascii=False, indent=4, separators=(',', ':')))
 
         if False:  # test code
-            bk_table = Utils.readCSVFromCache('today_stocks')
+            bk_table = Utils.readCSVFromCache('today_stocks_' + date)
         else:
             for i in range(0, group + 1):
                 data = ball.quotec(symbols[i])
@@ -91,7 +93,7 @@ class AnalyzeData:
                         'percent': item['percent'],
                         'current_year_percent': item['current_year_percent'],
                     }, ignore_index=True)
-            Utils.saveCSVToCache(bk_table, 'today_stocks')
+            Utils.saveCSVToCache(bk_table, 'today_stocks_' + date)
 
         # 排除ST
         bk_table = bk_table[~(bk_table.name.str.contains('ST'))]
@@ -135,6 +137,8 @@ class AnalyzeData:
     @staticmethod
     def getCapitalAssort(ball):
 
+        date = time.strftime("%Y-%m-%d", time.localtime())
+
         headAndTail = 20
 
         print("获取个股资金排行...")
@@ -167,7 +171,7 @@ class AnalyzeData:
                     '': Utils.divFormat(flow['sell_small'], flow['sell_total']),
                 }, ignore_index=True)
 
-        Utils.saveCSVToCache(bk_table, 'today_flow')
+        Utils.saveCSVToCache(bk_table, 'today_flow_' + date)
 
         print("今日流入前20:")
         head_table = bk_table[bk_table.percent > 0].sort_values('large', ascending=False).head(
@@ -192,6 +196,8 @@ class AnalyzeData:
 
     @staticmethod
     def getBKs(ball):
+
+        date = time.strftime("%Y-%m-%d", time.localtime())
 
         groupLength = 100
         headAndTail = 10
@@ -237,8 +243,6 @@ class AnalyzeData:
                     'percent': item['percent'],
                     'current_year_percent': item['current_year_percent'],
                 }, ignore_index=True)
-
-        Utils.saveCSVToCache(bk_table, 'today_bk')
 
         print("今日涨幅前10板块")
         head_table = bk_table[bk_table.percent > 0].sort_values('percent', ascending=False).head(
