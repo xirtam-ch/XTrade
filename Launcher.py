@@ -163,12 +163,12 @@ if __name__ == '__main__':
         "### 今日上涨:" + str(today_up)
         + "，横盘:" + str(today_same)
         + "，下跌:" + str(today_down)
-        + "，涨跌比:" + str(Utils.divFormat(today_up, today_down))
+        + "，涨跌比:" + str(round(Utils.divFormat(today_up, today_down), 2))
     )
 
     st.markdown(
-        "### 涨幅中位数:" + str(np.median(df_stocks_today[df_stocks_today.percent > 0].percent)) + "%"
-        + "，跌幅中位数:" + str(np.median(df_stocks_today[df_stocks_today.percent < 0].percent)) + "%"
+        "### 涨幅中位数:" + str(round(np.median(df_stocks_today[df_stocks_today.percent > 0].percent), 2)) + "%"
+        + "，跌幅中位数:" + str(round(np.median(df_stocks_today[df_stocks_today.percent < 0].percent), 2)) + "%"
     )
 
     st.markdown(
