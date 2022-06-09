@@ -4,6 +4,9 @@
 df = pro.stk_holdernumber(ts_code='300199.SZ', start_date='20160101', end_date='20181231')
 股东人数
 
+- 个股加PE等quote_detail数据
+- 在页面上还原历史某天数据
+
 研报列表增加已读，删除清理，和加精
 ____________
 
