@@ -77,47 +77,61 @@ class AnalyzeData:
 
         # print(json.dumps(data, sort_keys=True, ensure_ascii=False, indent=4, separators=(',', ':')))
 
-        for i in range(0, group + 1):
-            data = ball.quotec(symbols[i])
-            for item in data['data']:
-                bk_table = bk_table.append({
-                    'code': item['symbol'],
-                    'name': bk_keys.loc[
-                        Utils.B2Tcode(item['symbol'])
-                    ]['name'],
-                    'percent': item['percent'],
-                    'current_year_percent': item['current_year_percent'],
-                    'site': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + item['symbol'] + "\">" + item[
-                        'symbol'] + "</a>",
-                }, ignore_index=True)
-        Utils.saveCSVToCache(bk_table, 'today_stocks')
+        if True:  # test code
+            bk_table = Utils.readCSVFromCache('today_stocks')
+        else:
+            for i in range(0, group + 1):
+                data = ball.quotec(symbols[i])
+                for item in data['data']:
+                    bk_table = bk_table.append({
+                        'code': item['symbol'],
+                        'name': bk_keys.loc[
+                            Utils.B2Tcode(item['symbol'])
+                        ]['name'],
+                        'amount': item['amount'],
+                        'percent': item['percent'],
+                        'current_year_percent': item['current_year_percent'],
+                        'site': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + item['symbol'] + "\">" +
+                                item[
+                                    'symbol'] + "</a>",
+                    }, ignore_index=True)
+            Utils.saveCSVToCache(bk_table, 'today_stocks')
 
-        print("今日涨幅前10:")
+        print("今日涨幅前10")
         head_table = bk_table[bk_table.percent > 0].sort_values('percent', ascending=False).head(
             headAndTail).reset_index()
         # head_table['site'] = head_table.apply(lambda x: "https://xueqiu.com/S/" + x.code, axis=1)
         # head_table['site'] = "https://xueqiu.com/S/" + head_table['code']
-        print(head_table.loc[:, ['name', 'percent', 'site']])
+        head_table = head_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
 
-        print("今日跌幅前10:")
+        print("今日跌幅前10")
         tail_table = bk_table[bk_table.percent < 0].sort_values('percent').head(
             headAndTail).reset_index()
 
-        print(tail_table.loc[:, ['name', 'percent', 'site']])
+        tail_table = tail_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
 
-        print("今年涨幅幅前10:")
+        print("今日成交额前10")
+        amount_head_table = bk_table[bk_table.amount > 0].sort_values('amount', ascending=False).head(
+            headAndTail).reset_index()
+        amount_head_table = amount_head_table.loc[:, ['name', 'amount', 'percent', 'current_year_percent', 'site']]
+
+        print("今日成交额后10")
+        amount_tail_table = bk_table[bk_table.amount > 0].sort_values('amount').head(
+            headAndTail).reset_index()
+        amount_tail_table = amount_tail_table.loc[:, ['name', 'amount', 'percent', 'current_year_percent', 'site']]
+
+        print("今年涨幅幅前10")
         year_head_table = bk_table[bk_table.current_year_percent > 0].sort_values('current_year_percent',
                                                                                   ascending=False).head(
             headAndTail).reset_index()
+        year_head_table = year_head_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
 
-        print(year_head_table.loc[:, ['name', 'current_year_percent', 'site']])
-
-        print("今年跌幅前10:")
+        print("今年跌幅前10")
         year_tail_table = bk_table[bk_table.current_year_percent < 0].sort_values('current_year_percent').head(
             headAndTail).reset_index()
-        print(year_tail_table.loc[:, ['name', 'current_year_percent', 'site']])
+        year_tail_table = year_tail_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
 
-        return head_table, tail_table, year_head_table, year_tail_table
+        return head_table, tail_table, amount_head_table, amount_tail_table, year_head_table, year_tail_table
 
     @staticmethod
     def getCapitalAssort(ball):
@@ -229,26 +243,26 @@ class AnalyzeData:
 
         Utils.saveCSVToCache(bk_table, 'today_bk')
 
-        print("今日涨幅前10:")
+        print("今日涨幅前10板块")
         head_table = bk_table[bk_table.percent > 0].sort_values('percent', ascending=False).head(
             headAndTail).reset_index()
-        print(head_table.loc[:, ['name', 'percent', 'site']])
+        head_table = head_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
 
-        print("今日跌幅前10:")
+        print("今日跌幅前10板块")
         tail_table = bk_table[bk_table.percent < 0].sort_values('percent').head(
             headAndTail).reset_index()
-        print(tail_table.loc[:, ['name', 'percent', 'site']])
+        tail_table = tail_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
 
-        print("今年涨幅幅前10:")
+        print("今年涨幅幅前10板块")
         year_head_table = bk_table[bk_table.current_year_percent > 0].sort_values('current_year_percent',
                                                                                   ascending=False).head(
             headAndTail).reset_index()
-        print(year_head_table.loc[:, ['name', 'current_year_percent', 'site']])
+        year_head_table = year_head_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
 
-        print("今年跌幅前10:")
+        print("今年跌幅前10板块")
         year_tail_table = bk_table[bk_table.current_year_percent < 0].sort_values('current_year_percent').head(
             headAndTail).reset_index()
-        print(year_tail_table.loc[:, ['name', 'current_year_percent', 'site']])
+        year_tail_table = year_tail_table.loc[:, ['name', 'percent', 'current_year_percent', 'site']]
 
         return head_table, tail_table, year_head_table, year_tail_table
 
