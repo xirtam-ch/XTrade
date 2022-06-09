@@ -1,4 +1,4 @@
-# 备份/backup
+# 食用方法
 
 - 需要在XTrade/token.config中添加雪球和tushare的token
 
