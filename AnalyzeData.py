@@ -115,8 +115,8 @@ class AnalyzeData:
         amount_head_table = amount_head_table.loc[:, ['name', 'amount', 'percent', 'current_year_percent']]
 
         print("今日成交额后10")
-        amount_tail_table = bk_table[~(bk_table.index.str.contains('BJ')) & (bk_table.amount > 0)].sort_values(
-            'amount').head(headAndTail).reset_index()
+        amount_tail_table = bk_table[(bk_table.amount > 0)].sort_values('amount').reset_index()
+        amount_tail_table = amount_tail_table[~(amount_tail_table['code'].str.contains('BJ'))].head(headAndTail)
         amount_tail_table = amount_tail_table.loc[:, ['name', 'amount', 'percent', 'current_year_percent']]
 
         print("今年涨幅幅前10")
