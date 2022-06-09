@@ -24,6 +24,10 @@ def add_color(table, column):
         lambda x: f"<div class='bg_green'>{x}</div>" if x > 0 else f"<div class='bg_red'>{x}</div>")
 
 
+def str_big_number(table, column):
+    table[column] = table[column].map(lambda x: Utils.str_of_num(x))
+
+
 if __name__ == '__main__':
 
     config = ConfigParser()
@@ -113,20 +117,37 @@ if __name__ == '__main__':
 
     st.write(df_stocks[1].to_html(escape=False, index=False), unsafe_allow_html=True)
 
-    st.markdown("### 今年涨幅前10个股:")
+    st.write("")
+    st.markdown("### 今日成交额前10个股:")
 
     add_color(df_stocks[2], 'percent')
     add_color(df_stocks[2], 'current_year_percent')
-
+    str_big_number(df_stocks[2], 'amount')
     st.write(df_stocks[2].to_html(escape=False, index=False), unsafe_allow_html=True)
+    st.write("")
+    st.markdown("### 今日成交额后10个股:")
+
+    add_color(df_stocks[3], 'percent')
+    add_color(df_stocks[3], 'current_year_percent')
+    str_big_number(df_stocks[3], 'amount')
+
+    st.write(df_stocks[3].to_html(escape=False, index=False), unsafe_allow_html=True)
+
+    st.write("")
+    st.markdown("### 今年涨幅前10个股:")
+
+    add_color(df_stocks[4], 'percent')
+    add_color(df_stocks[4], 'current_year_percent')
+
+    st.write(df_stocks[4].to_html(escape=False, index=False), unsafe_allow_html=True)
 
     st.write("")
     st.markdown("### 今年跌幅前10个股:")
 
-    add_color(df_stocks[3], 'percent')
-    add_color(df_stocks[3], 'current_year_percent')
+    add_color(df_stocks[5], 'percent')
+    add_color(df_stocks[5], 'current_year_percent')
 
-    st.write(df_stocks[3].to_html(escape=False, index=False), unsafe_allow_html=True)
+    st.write(df_stocks[5].to_html(escape=False, index=False), unsafe_allow_html=True)
     ## 个股涨跌
 
     st.write("")
