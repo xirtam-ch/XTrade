@@ -30,6 +30,8 @@ def str_big_number(table, column):
 
 if __name__ == '__main__':
 
+    os.environ['NUMEXPR_MAX_THREADS'] = '8'
+
     config = ConfigParser()
     config.read('token.config')
 
