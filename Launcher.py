@@ -207,7 +207,7 @@ if __name__ == '__main__':
     AnalyzeData.get_report(AnalyzeData.get_url(0, ), type=0, keyword="首次")  # 个股
 
     # 仅获取自选股个股研报
-    # for code in myStock:
-    #     AnalyzeData.get_report(AnalyzeData.get_url(0, code=code), 0)  # 个股
+    for code in myStock:
+        AnalyzeData.get_report(AnalyzeData.get_url(0, code=code), 0)  # 个股
 
     print("执行完毕")
