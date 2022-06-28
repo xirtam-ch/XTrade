@@ -315,7 +315,7 @@ class AnalyzeData:
 
                 fileName = res_js["data"][i]["title"].replace('/', u"\u2215")
 
-                if keyword is not None and keyword not in fileName:
+                if keyword is not None and not any(word in fileName for word in keyword):
                     continue
 
                 # if type == 0:  # 个股文件名单独处理
