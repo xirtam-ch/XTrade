@@ -281,12 +281,7 @@ class AnalyzeData:
 
         return url_list
 
-    def get_report(url_list, type=1):  # type0是个股，type1是行业，3是宏观
-        '''
-        获取东方财富网宏观研报表格信息
-        url_list是指宏观研报链接
-        '''
-
+    def get_report(url_list, type=1, keyword=None):  # type0是个股，type1是行业，3是宏观
         date = time.strftime("%Y-%m-%d", time.localtime())
 
         dict = {
@@ -311,11 +306,17 @@ class AnalyzeData:
             if type == 1 or type == 3:
                 res_text = res_text[17:-1]
 
+            if res_text.startswith('datatable'):
+                res_text = re.sub('datatable.*\\(', '', res_text)[:-1]
+
             res_js = json.loads(res_text)
             for i in range(len(res_js["data"])):
                 index += 1
 
                 fileName = res_js["data"][i]["title"].replace('/', u"\u2215")
+
+                if keyword is not None and keyword not in fileName:
+                    continue
 
                 # if type == 0:  # 个股文件名单独处理
                 #     fileName = "" + fileName
