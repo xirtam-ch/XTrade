@@ -337,6 +337,7 @@ class AnalyzeData:
                             if chunk:
                                 fp.write(chunk)
                 else:
-                    print("pass " + fileName)
+                    pass
+                    # print("pass " + fileName)
 
             # sleep(random.uniform(1, 2))
