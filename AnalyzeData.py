@@ -307,7 +307,7 @@ class AnalyzeData:
                 res_text = res_text[17:-1]
 
             if res_text.startswith('datatable'):
-                res_text = re.sub('datatable.*\\(', '', res_text)[:-1]
+                res_text = re.sub('datatable\d+\\(', '', res_text)[:-1]
 
             res_js = json.loads(res_text)
             for i in range(len(res_js["data"])):
