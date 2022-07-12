@@ -12,6 +12,7 @@ from DataUpgrade import DataUpgrade
 from Utils import Utils
 from C import C
 from configparser import ConfigParser
+import pandas as pd
 
 
 def local_css(file_name):
@@ -181,6 +182,11 @@ if __name__ == '__main__':
         "### 涨幅超9.5%:" + str(df_stocks_today[df_stocks_today.percent > 9.5].shape[0])
         + "，跌幅超9.5%:" + str(df_stocks_today[df_stocks_today.percent < -9.5].shape[0])
     )
+
+    # 测试折线图 开始
+    # st.line_chart(np.array(df_stocks_today[df_stocks_today.percent > 0].sort_values('percent').percent).tolist())
+    # st.line_chart(np.array(pd.DataFrame.abs(df_stocks_today[df_stocks_today.percent < 0].sort_values('percent', ascending=False).percent)).tolist())
+    # 测试折线图 结束
 
     # ## 个股资金
     # df_stocks = AnalyzeData.getCapitalAssort(ball)
