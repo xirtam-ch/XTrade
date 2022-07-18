@@ -8,6 +8,9 @@ xueqiu=xq_a_token=xxxx;
 tushare=xxxx
 ```
 
-
 - 代码健壮性很差，慎重使用
+
+# 获取股东人数例子
+
+```python GD.py SZ:002838```
 
