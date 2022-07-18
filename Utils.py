@@ -1,9 +1,9 @@
 # coding: utf-8
 import os
+import time
 
 import numpy as np
 import pandas as pd
-import time
 
 from C import C
 
@@ -31,6 +31,10 @@ class Utils:
     @staticmethod
     def B2Tcode(code):
         return code[2:8] + "." + code[:2]
+
+    @staticmethod
+    def B2TcodeWithColon(code):  # 带冒号的雪球转tushare
+        return code[3:9] + "." + code[:2]
 
     @staticmethod
     def saveToCSV(df, path, index=False):
