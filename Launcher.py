@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import time
 
 import numpy as np
@@ -60,6 +61,9 @@ if __name__ == '__main__':
         # 更新基础数据
         DataUpgrade.updateBK(ball)
         DataUpgrade.updateStocks(pro)
+
+    elif len(sys.argv) > 1 and sys.argv[1] == 'bk':
+        DataUpgrade.updateBK(ball)
 
     if not os.path.exists(C.CACHE_PATH):
         os.mkdir(C.CACHE_PATH)
