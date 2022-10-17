@@ -35,8 +35,8 @@ class DataUpgrade:
             bk = ball.quote_detail(code)
             quote = bk['data']['quote']
             market = bk['data']['market']
+            print(str(round(i / 10000 * 100, 2)) + '%')
             if quote:
-                print(code)
                 # print(json.dumps(bk, sort_keys=True, ensure_ascii=False, indent=4, separators=(',', ':')))
                 bk_table = bk_table.append({
                     'code': code,
