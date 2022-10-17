@@ -213,10 +213,11 @@ if __name__ == '__main__':
     AnalyzeData.get_report(AnalyzeData.get_url(3), type=3)  # 宏观
 
     print('行业研报...')
-    AnalyzeData.get_report(AnalyzeData.get_url(1), type=1, keyword=['深度', '旅游'])  # 行业
+    AnalyzeData.get_report(AnalyzeData.get_url(1), type=1)  # 行业
+    # AnalyzeData.get_report(AnalyzeData.get_url(1), type=1, keyword=['深度', '旅游'])  # 行业
 
     print('个股研报...')
-    AnalyzeData.get_report(AnalyzeData.get_url(0, ), type=0, keyword="首次")  # 个股
+    AnalyzeData.get_report(AnalyzeData.get_url(0, ), type=0)  # 个股
 
     # 仅获取自选股个股研报
     for code in myStock:
