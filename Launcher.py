@@ -23,7 +23,7 @@ def local_css(file_name):
 
 def add_color(table, column):
     table[column] = table[column].map(
-        lambda x: f"<div class='bg_green'>{x}</div>" if x > 0 else f"<div class='bg_red'>{x}</div>")
+        lambda x: f"<div class='bg_green'>{x}</div>" if (x is not None and x > 0) else f"<div class='bg_red'>{x}</div>")
 
 
 def str_big_number(table, column):
