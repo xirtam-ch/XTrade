@@ -11,7 +11,7 @@ from C import C
 class Utils:
 
     @staticmethod
-    def T2Bcode(code):
+    def T2Bcode(code): ## 603102.SH -> SH603102
         return code.split(".")[1] + code.split(".")[0]
 
     @staticmethod
