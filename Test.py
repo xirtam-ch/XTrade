@@ -37,8 +37,11 @@ if __name__ == '__main__':
     # DataUpgrade.updateBK(ball)
     # DataUpgrade.updateStocks(pro)
 
-    print(ball.quote_detail('BK0001'))
+    # print(ball.quote_detail('BK0001'))
 
+    fReport = AnalyzeData.getFReport()
+    fReportTable = AnalyzeData.getStocksTable(ball, fReport)
+    print(fReportTable)
     # AnalyzeData.get_report(AnalyzeData.get_url(3), 3)  # 宏观
     #
     # print("### 西藏旅游股东人数")
