@@ -2,6 +2,7 @@ import json
 import os
 import random
 import time
+from datetime import timedelta, datetime
 from time import sleep
 
 import openpyxl
@@ -190,9 +191,9 @@ class AnalyzeData:
             headAndTail).reset_index()
 
         return head_table.loc[:, ['name', 'large', 'percent', 'current_year_percent']], \
-               tail_table.loc[:, ['name', 'large', 'percent', 'current_year_percent']], \
-               head_table_layge.loc[:, ['name', 'buy_large', 'percent', 'current_year_percent']], \
-               tail_table_layge.loc[:, ['name', 'sell_large', 'percent', 'current_year_percent']]
+            tail_table.loc[:, ['name', 'large', 'percent', 'current_year_percent']], \
+            head_table_layge.loc[:, ['name', 'buy_large', 'percent', 'current_year_percent']], \
+            tail_table_layge.loc[:, ['name', 'sell_large', 'percent', 'current_year_percent']]
 
     @staticmethod
     def getBKs(ball):
@@ -341,3 +342,83 @@ class AnalyzeData:
                     # print("pass " + fileName)
 
             # sleep(random.uniform(1, 2))
+
+    @staticmethod
+    def getFReport():
+        headers = {
+            'Host': 'datacenter-web.eastmoney.com',
+            'sec-ch-ua': '"Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"',
+            'sec-ch-ua-mobile': '?0',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
+            'sec-ch-ua-platform': '"macOS"',
+            'Accept': '*/*',
+            'Sec-Fetch-Site': 'same-site',
+            'Sec-Fetch-Mode': 'no-cors',
+            'Sec-Fetch-Dest': 'script',
+            'Referer': 'https://data.eastmoney.com/',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Cookie': 'qgqp_b_id=3997baaa71fb9a0d03b20110481eb575; HAList=ty-100-RTS-%u4FC4%u7F57%u65AFRTS; st_si=68922960107662; st_asi=delete; JSESSIONID=036ED8B200088541963AC0A51CEBF105; st_pvi=60029143568755; st_sp=2019-10-10%2011%3A05%3A42; st_inirUrl=https%3A%2F%2Fwww.google.com%2F; st_sn=8; st_psi=20230427094251587-113300301069-5338659879'
+        }
+
+        params = {
+            'callback': 'jQuery112306298208397781508_1682559797537',
+            'sortColumns': 'FIRST_APPOINT_DATE,SECURITY_CODE',
+            'sortTypes': '1,1',
+            'pageSize': '5000',
+            'pageNumber': '1',
+            'reportName': 'RPT_PUBLIC_BS_APPOIN',
+            'columns': 'ALL',
+            'filter': '(SECURITY_TYPE_CODE in ("058001001","058001008"))(TRADE_MARKET_CODE!="069001017")(REPORT_DATE=\'2023-03-31\')'
+        }
+
+        response = requests.get('https://datacenter-web.eastmoney.com/api/data/v1/get', headers=headers, params=params)
+        json_str = re.search(r'\{.*\}', response.text).group()
+
+        # 解析JSON
+        jsonBean = json.loads(json_str)
+
+        result = []
+        for item in jsonBean['result']['data']:
+            time_str = ''
+            if item['THIRD_CHANGE_DATE'] is not None:
+                time_str = item['THIRD_CHANGE_DATE']
+            elif item['SECOND_CHANGE_DATE'] is not None:
+                time_str = item['SECOND_CHANGE_DATE']
+            elif item['FIRST_CHANGE_DATE'] is not None:
+                time_str = item['FIRST_CHANGE_DATE']
+            else:
+                time_str = item['FIRST_APPOINT_DATE']
+
+            # 将time_str转换为datetime对象
+            time_obj = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+
+            # 将日期增加一天
+            tomorrow_obj = datetime.now() + timedelta(days=1)
+
+            # 判断日期是否为明天
+            if tomorrow_obj.date() == time_obj.date():
+                # print(item['SECURITY_NAME_ABBR'] + ' ' + time_str)
+                result.append(item['SECUCODE'])
+                # print(item['SECUCODE'])
+            else:
+                # print(item['SECURITY_NAME_ABBR'] + ' ' + time_str)
+                pass
+        return result
+
+    @staticmethod
+    def getStocksTable(ball, codes):
+        bk_keys = Utils.readFromCSV('stocks')
+        resultTable = pd.DataFrame(columns=['name', 'amount', 'percent', 'current_year_percent'])
+
+        for code in codes:
+            data = ball.quotec(Utils.T2Bcode(code))
+            for item in data['data']:
+                resultTable = resultTable.append({
+                    'name': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + item['symbol'] + "\">" +
+                            bk_keys.loc[Utils.B2Tcode(item['symbol'])]['name'] + "</a>",
+                    'amount': item['amount'],
+                    'percent': item['percent'],
+                    'current_year_percent': item['current_year_percent'],
+                }, ignore_index=True)
+
+        return resultTable

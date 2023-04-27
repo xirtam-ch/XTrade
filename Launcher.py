@@ -46,11 +46,15 @@ if __name__ == '__main__':
     date = time.strftime("%Y-%m-%d", time.localtime())
 
     myStockWithName = [  # 自选股，跟踪个股研报，格式直接从雪球网页复制
-        '西藏旅游(SH:600749)', "千味央厨(SZ:001215)", "亚钾国际(SZ:000893)", "小熊电器(SZ:002959)", "盐湖股份(SZ:000792)",
-        "杭萧钢构(SH:600477)", '中望软件(SH:688083)', '兴发集团(SH:600141)', '华大基因(SZ:300676)', "雪人股份(SZ:002639)",
-        "牧高笛(SH:603908)", "燕京啤酒(SZ:000729)", "和远气体(SZ:002971)", "中体产业(SH:600158)", '中国船舶(SH:600150)', '中无人机(SH:688297)',
+        '西藏旅游(SH:600749)', "千味央厨(SZ:001215)", "亚钾国际(SZ:000893)", "小熊电器(SZ:002959)",
+        "盐湖股份(SZ:000792)",
+        "杭萧钢构(SH:600477)", '中望软件(SH:688083)', '兴发集团(SH:600141)', '华大基因(SZ:300676)',
+        "雪人股份(SZ:002639)",
+        "牧高笛(SH:603908)", "燕京啤酒(SZ:000729)", "和远气体(SZ:002971)", "中体产业(SH:600158)", '中国船舶(SH:600150)',
+        '中无人机(SH:688297)',
         '新强联(SZ:300850)', '奇安信-U(SH:688561)', "成都先导(SH:688222)", "洽洽食品(SZ:002557)", "农发种业(SH:600313)",
-        '东方电缆(SH:603606)', '东方财富(SZ:300059)', '沃森生物(SZ:300142)', '道恩股份(SZ:002838)', '南模生物(SH:688265)', '君亭酒店(SZ:301073)'
+        '东方电缆(SH:603606)', '东方财富(SZ:300059)', '沃森生物(SZ:300142)', '道恩股份(SZ:002838)',
+        '南模生物(SH:688265)', '君亭酒店(SZ:301073)'
     ]
 
     myStock = {x[-7:-1] for x in myStockWithName}
@@ -76,6 +80,16 @@ if __name__ == '__main__':
     st.markdown(f"[打开个股研报](file:///{C.REPORT_PATH}{date}-个股/)")
     st.markdown(f"[打开行业研报](file:///{C.REPORT_PATH}{date}-行业/)")
     st.markdown(f"[打开宏观研报](file:///{C.REPORT_PATH}{date}-宏观/)")
+
+    st.write("")
+    st.markdown("### 今晚财报:")
+
+    fReport = AnalyzeData.getFReport()
+    fReportTable = AnalyzeData.getStocksTable(ball, fReport)
+    add_color(fReportTable, 'percent')
+    add_color(fReportTable, 'current_year_percent')
+    str_big_number(fReportTable, 'amount')
+    st.write(fReportTable.to_html(escape=False, index=False), unsafe_allow_html=True)
 
     st.write("")
     st.markdown("### 今日涨幅前10板块:")
