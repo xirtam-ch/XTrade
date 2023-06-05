@@ -43,7 +43,7 @@ class DataUpgrade:
                     'name': quote['name'],
                     'price': quote['current'],
                     'date': quote['time'],
-                    'stock_count': str(int(quote['fall_count'] or 0) + int(quote['flat_count'] or 0)),
+                    'stock_count': str(int(quote['fall_count'] or 0) + int(quote['flat_count'] or 0) + int(quote['rise_count'] or 0)),
                     'market_capital': quote['market_capital'],
                     'region': market['region'],
                 }, ignore_index=True)
