@@ -77,6 +77,9 @@ if __name__ == '__main__':
     # 板块涨跌
     dfs = AnalyzeData.getBKs(ball)
 
+    chartData = AnalyzeData.getChart()
+    st.line_chart(chartData,x='date',y='X')
+
     st.markdown(f"[打开个股研报](file:///{C.REPORT_PATH}{date}-个股/)")
     st.markdown(f"[打开行业研报](file:///{C.REPORT_PATH}{date}-行业/)")
     st.markdown(f"[打开宏观研报](file:///{C.REPORT_PATH}{date}-宏观/)")

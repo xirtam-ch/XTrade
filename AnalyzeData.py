@@ -4,6 +4,7 @@ import random
 import time
 from datetime import timedelta, datetime
 from time import sleep
+import baostock as bs
 
 import openpyxl
 import pandas as pd
@@ -245,6 +246,8 @@ class AnalyzeData:
                     'current_year_percent': item['current_year_percent'],
                 }, ignore_index=True)
 
+        Utils.saveCSVToCache(bk_table, 'today_bks_' + date)
+
         print("今日涨幅前10板块")
         head_table = bk_table[bk_table.percent > 0].sort_values('percent', ascending=False).head(
             headAndTail).reset_index()
@@ -378,31 +381,32 @@ class AnalyzeData:
         jsonBean = json.loads(json_str)
 
         result = []
-        for item in jsonBean['result']['data']:
-            time_str = ''
-            if item['THIRD_CHANGE_DATE'] is not None:
-                time_str = item['THIRD_CHANGE_DATE']
-            elif item['SECOND_CHANGE_DATE'] is not None:
-                time_str = item['SECOND_CHANGE_DATE']
-            elif item['FIRST_CHANGE_DATE'] is not None:
-                time_str = item['FIRST_CHANGE_DATE']
-            else:
-                time_str = item['FIRST_APPOINT_DATE']
+        if jsonBean['result'] is not None:
+            for item in jsonBean['result']['data']:
+                time_str = ''
+                if item['THIRD_CHANGE_DATE'] is not None:
+                    time_str = item['THIRD_CHANGE_DATE']
+                elif item['SECOND_CHANGE_DATE'] is not None:
+                    time_str = item['SECOND_CHANGE_DATE']
+                elif item['FIRST_CHANGE_DATE'] is not None:
+                    time_str = item['FIRST_CHANGE_DATE']
+                else:
+                    time_str = item['FIRST_APPOINT_DATE']
 
-            # 将time_str转换为datetime对象
-            time_obj = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+                # 将time_str转换为datetime对象
+                time_obj = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
 
-            # 将日期增加一天
-            tomorrow_obj = datetime.now() + timedelta(days=1)
+                # 将日期增加一天
+                tomorrow_obj = datetime.now() + timedelta(days=1)
 
-            # 判断日期是否为明天
-            if tomorrow_obj.date() == time_obj.date():
-                # print(item['SECURITY_NAME_ABBR'] + ' ' + time_str)
-                result.append(item['SECUCODE'])
-                # print(item['SECUCODE'])
-            else:
-                # print(item['SECURITY_NAME_ABBR'] + ' ' + time_str)
-                pass
+                # 判断日期是否为明天
+                if tomorrow_obj.date() == time_obj.date():
+                    # print(item['SECURITY_NAME_ABBR'] + ' ' + time_str)
+                    result.append(item['SECUCODE'])
+                    # print(item['SECUCODE'])
+                else:
+                    # print(item['SECURITY_NAME_ABBR'] + ' ' + time_str)
+                    pass
         return result
 
     @staticmethod
@@ -422,3 +426,58 @@ class AnalyzeData:
                 }, ignore_index=True)
 
         return resultTable
+
+    @staticmethod
+    def getChart():
+        # 登录baostock
+        bs.login()
+
+        # 获取股票从5月1日到5月10日的5分钟数据
+        rs = bs.query_history_k_data_plus("sh.600749",
+                                          "date,time,open,high,low,close,volume",
+                                          start_date="2023-04-01", end_date="2333-12-31",
+                                          frequency="5",
+                                          adjustflag="3")
+
+        # 将获取到的数据转换为DataFrame格式
+        data_list = []
+        while (rs.error_code == '0') & rs.next():
+            row_data = rs.get_row_data()
+            data_list.append(row_data)
+        df = pd.DataFrame(data_list, columns=rs.fields)
+
+        # 检查数据中是否存在缺失值或非数值的数据
+        if df.isnull().values.any():
+            print("Warning: The data contains missing values!")
+        if not pd.to_numeric(df["volume"], errors="coerce").notnull().all() \
+                or not pd.to_numeric(df["close"], errors="coerce").notnull().all():
+            print("Warning: The data contains non-numeric values!")
+
+        # 对数据进行类型转换
+        df["volume"] = pd.to_numeric(df["volume"], errors="coerce")
+        df["close"] = pd.to_numeric(df["close"], errors="coerce")
+
+        total_amount = df.groupby("date")["volume"].sum()
+        # 计算每天的第2到6条5分钟数据的总成交额
+        df["cum_volume"] = df.groupby("date")["volume"].cumsum()
+        df["cum_count"] = df.groupby("date")["date"].cumcount() + 1
+        df = df.loc[df["cum_count"].isin([1, 2, 3])]
+
+        # 计算每天的总成交额，并计算指标X
+
+        # print(f'total_amount {total_amount}')
+        cum_amount = df.groupby("date")["volume"].sum()
+        X = cum_amount / total_amount
+
+        # 保存指标X到新的表格
+        df_new = pd.DataFrame({
+            "date": X.index,
+            "X": X.values,
+            "cum_amount": cum_amount.values,
+            "total_amount": total_amount.values
+        })
+        # df_new.to_csv("X.csv", index=False)
+
+        # 关闭baostock
+        bs.logout()
+        return df_new
