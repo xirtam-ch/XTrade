@@ -189,9 +189,9 @@ if __name__ == '__main__':
 
     today_sum = today_up + today_same + today_down
     st.markdown(
-        "### 今日上涨:" + str(today_up) +"(" + str(round(Utils.divFormat(today_up, today_sum), 2) * 100) + "%)"
-        + "，横盘:" + str(today_same) +"(" + str(round(Utils.divFormat(today_same, today_sum), 2) * 100) + "%)"
-        + "，下跌:" + str(today_down) +"(" + str(round(Utils.divFormat(today_down, today_sum), 2) * 100) + "%)"
+        "### 今日上涨:" + str(today_up) + "(" + str(round(Utils.divFormat(today_up, today_sum) * 100, 2)) + "%)"
+        + "，横盘:" + str(today_same) + "(" + str(round(Utils.divFormat(today_same, today_sum) * 100, 2)) + "%)"
+        + "，下跌:" + str(today_down) + "(" + str(round(Utils.divFormat(today_down, today_sum) * 100, 2)) + "%)"
     )
 
     st.markdown(
