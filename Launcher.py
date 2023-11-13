@@ -85,7 +85,7 @@ if __name__ == '__main__':
     st.markdown(f"[打开宏观研报](file:///{C.REPORT_PATH}{date}-宏观/)")
 
     st.write("")
-    st.markdown("### 今晚财报:")
+    st.markdown("### 自选今日财报:")
 
     fReport = AnalyzeData.getFReport()
     fReportTable = AnalyzeData.getStocksTable(ball, fReport)
