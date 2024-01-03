@@ -28,14 +28,15 @@ class DataUpgrade:
 
         bk_table = pd.DataFrame(columns=['code', 'name', 'price', 'date', 'stock_count', 'market_capital', 'region'])
 
-        for i in range(1, 9999):
+# 1xxx是US  2xxx是HK，国内bk目前只有999以下
+        for i in range(1, 999):
 
             code = 'BK' + str(i).zfill(4)
 
             bk = ball.quote_detail(code)
             quote = bk['data']['quote']
             market = bk['data']['market']
-            print(str(round(i / 10000 * 100, 2)) + '%')
+            print(str(round(i / 1000 * 100, 2)) + '%')
             if quote:
                 # print(json.dumps(bk, sort_keys=True, ensure_ascii=False, indent=4, separators=(',', ':')))
                 bk_table = bk_table.append({
