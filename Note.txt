@@ -1,15 +1,3 @@
-个股成交量前后10名
-个股涨跌数量 分板 分市值
-
-df = pro.stk_holdernumber(ts_code='300199.SZ', start_date='20160101', end_date='20181231')
-股东人数
-
-- 个股加PE等quote_detail数据
-- 在页面上还原历史某天数据
-
-研报列表增加已读，删除清理，和加精
-____________
-
 https://github.com/uname-yang/pysnowball
 https://tushare.pro/document/2?doc_id=27
 
@@ -22,3 +10,6 @@ qType{
     3: 宏观点评
     4: 券商晨报
 }
+
+个股研报列表
+https://stock.finance.sina.com.cn/stock/go.php/vReport_List/kind/search/index.phtml?t1=2&symbol=301101
