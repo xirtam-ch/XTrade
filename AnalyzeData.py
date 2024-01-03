@@ -10,17 +10,66 @@ import openpyxl
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from pysnowball import api_ref, utls
 
 from C import C
 from Utils import Utils
 import re
+import pysnowball as ball
 
 
 class AnalyzeData:
 
     @staticmethod
-    def getStocks(ball):
+    def get_last_week_activity_index():
+        date = time.strftime("%Y-%m-%d", time.localtime())
 
+        if os.path.exists(os.path.join(C.CACHE_PATH + 'last_week_activity_' + date + '.csv')):
+            print(f'get_last_week_activity_index 使用缓存')
+            return Utils.readCSVFromCache('last_week_activity_' + date)
+
+        url = "https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol={}&begin={}&period=week&type=before&count=-{}&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance"
+        all_stock_keys = Utils.readFromCSV('stocks')
+        stock_keys = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
+
+        # 制表保存
+        bk_table = pd.DataFrame(columns=['code', 'amount', 'indicator'])
+
+        count = 0
+        try:
+            for row in stock_keys.iterrows():
+                result = utls.fetch(url.format(Utils.T2Bcode(row[0]), int(time.time() * 1000), 3))
+
+                if len(result['data']['item']) < 3:
+                    print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}，新股无法计算')
+                    indicator = -1
+                else:
+                    item_0_amount = result['data']['item'][0][9]  # amount from item[0]
+                    item_1_amount = result['data']['item'][1][9]  # amount from item[1]
+
+                    # 计算指标
+                    if item_0_amount is not None and item_1_amount is not None and item_0_amount != 0:
+                        indicator = item_1_amount / item_0_amount
+                        print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
+                    else:
+                        indicator = -1
+                        print("无法计算指标，因为数据缺失或分母为零。")
+
+                bk_table = bk_table.append({
+                    'code': Utils.T2Bcode(row[0]),
+                    'amount': item_1_amount,
+                    'indicator': indicator,
+                }, ignore_index=True)
+
+                count = count + 1
+        except Exception as e:
+            print(f"出现异常: {e}")
+
+        Utils.saveCSVToCache(bk_table, 'last_week_activity_' + date)
+        return bk_table
+
+    @staticmethod
+    def getStocks(ball):
         date = time.strftime("%Y-%m-%d", time.localtime())
 
         groupLength = 300
