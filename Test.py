@@ -39,10 +39,13 @@ if __name__ == '__main__':
 
     # print(ball.quote_detail('BK0001'))
 
-    fReport = AnalyzeData.getFReport()
-    fReportTable = AnalyzeData.getStocksTable(ball, fReport)
-    print(fReportTable)
+    # fReport = AnalyzeData.getFReport()
+    # fReportTable = AnalyzeData.getStocksTable(ball, fReport)
+    # print(fReportTable)
     # AnalyzeData.get_report(AnalyzeData.get_url(3), 3)  # 宏观
     #
     # print("### 西藏旅游股东人数")
     # print(pro.stk_holdernumber(ts_code='600749.SH', start_date='20180101', end_date=date))
+
+    df_stocks = AnalyzeData.get_last_week_activity_index()
+    print(df_stocks)
