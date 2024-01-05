@@ -44,6 +44,14 @@ class AnalyzeData:
                 if len(result['data']['item']) < MAX_WEEK_COUNT:
                     print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}，新股无法计算')
                     indicator = -1
+
+                    bk_table = bk_table.append({
+                        'code': Utils.T2Bcode(row[0]),
+                        'last_week_amount': -1,
+                        'indicator': str(indicator),
+                        'last_week_percent': -1,
+                    }, ignore_index=True)
+
                 else:
                     item_0_amount = result['data']['item'][0][9]  # amount from item[0]
                     item_1_amount = result['data']['item'][1][9]  # amount from item[1]
@@ -60,12 +68,12 @@ class AnalyzeData:
                     # 进度条
                     print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
 
-                bk_table = bk_table.append({
-                    'code': Utils.T2Bcode(row[0]),
-                    'last_week_amount': item_3_amount,
-                    'indicator': str(indicator),
-                    'last_week_percent': result['data']['item'][3][7],
-                }, ignore_index=True)
+                    bk_table = bk_table.append({
+                        'code': Utils.T2Bcode(row[0]),
+                        'last_week_amount': item_3_amount,
+                        'indicator': str(indicator),
+                        'last_week_percent': result['data']['item'][3][7],
+                    }, ignore_index=True)
 
                 count = count + 1
         except Exception as e:
