@@ -4,18 +4,14 @@ from configparser import ConfigParser
 import pandas as pd
 import os
 
-from openpyxl.worksheet.hyperlink import Hyperlink
-
 from AnalyzeData import AnalyzeData
 from C import C
 
-from Utils import Utils
 import openpyxl
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.formula.translate import Translator
 import pysnowball as ball
-from openpyxl.utils import get_column_letter
 
 
 def prepare():
