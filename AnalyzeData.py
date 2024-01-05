@@ -32,10 +32,9 @@ class AnalyzeData:
         all_stock_keys = Utils.readFromCSV('stocks')
         remove_bj = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
         stock_keys = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
-        Utils.saveCSVToCache(stock_keys, 'test')
 
         # 制表保存
-        bk_table = pd.DataFrame(columns=['code', 'last_week_amount', 'indicator', 'last_week_percent'])
+        bk_table = pd.DataFrame(columns=['code', 'last_week_amount', 'indicator', 'last_week_percent', 'price'])
 
         count = 1
         MAX_WEEK_COUNT = 5
@@ -52,6 +51,7 @@ class AnalyzeData:
                         'last_week_amount': -1,
                         'indicator': str(indicator),
                         'last_week_percent': -1,
+                        'price': -1,
                     }, ignore_index=True)
 
                 else:
@@ -63,7 +63,7 @@ class AnalyzeData:
 
                     maxAmount = max(item_0_amount, item_1_amount, item_2_amount, item_3_amount, item_4_amount)
                     avgAmount = (
-                                            item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / MAX_WEEK_COUNT
+                                        item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / MAX_WEEK_COUNT
 
                     # 计算指标
                     indicator = maxAmount / avgAmount
@@ -76,6 +76,7 @@ class AnalyzeData:
                         'last_week_amount': item_3_amount,
                         'indicator': str(indicator),
                         'last_week_percent': result['data']['item'][3][7],
+                        'price': result['data']['item'][4][5]
                     }, ignore_index=True)
 
                 count = count + 1
