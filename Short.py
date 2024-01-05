@@ -77,15 +77,16 @@ if __name__ == '__main__':
     for table_index, row in sorted_filtered_df.iterrows():
         # 获取 DataFrame 中的相关数据
         code = table_index
+        name = row['name']
         indicator = row['indicator']
         price = row['price']
 
         # print(sheet)
         # 将数据填充到 Excel 文件中的相应列
-        name_cell = sheet.cell(row=index + 1, column=1, value=code)
+        name_cell = sheet.cell(row=index + 1, column=1, value=f'{name} {str(code)}')
         name_cell.hyperlink = f'https://xueqiu.com/S/{code}'
 
-        sheet.cell(row=index + 1, column=2, value=round(indicator, 2))
+        sheet.cell(row=index + 1, column=2, value=round(float(indicator), 2))
         sheet.cell(row=index + 1, column=3, value=price)
 
         index = index + 1
