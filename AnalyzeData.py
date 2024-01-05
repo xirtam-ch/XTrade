@@ -33,14 +33,15 @@ class AnalyzeData:
         stock_keys = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
 
         # 制表保存
-        bk_table = pd.DataFrame(columns=['code', 'last_week_amount', 'indicator', 'percent'])
+        bk_table = pd.DataFrame(columns=['code', 'last_week_amount', 'indicator', 'last_week_percent'])
 
         count = 1
+        MAX_WEEK_COUNT = 5
         try:
             for row in stock_keys.iterrows():
-                result = utls.fetch(url.format(Utils.T2Bcode(row[0]), int(time.time() * 1000), 5))
+                result = utls.fetch(url.format(Utils.T2Bcode(row[0]), int(time.time() * 1000), MAX_WEEK_COUNT))
 
-                if len(result['data']['item']) < 5:
+                if len(result['data']['item']) < MAX_WEEK_COUNT:
                     print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}，新股无法计算')
                     indicator = -1
                 else:
@@ -51,7 +52,7 @@ class AnalyzeData:
                     item_4_amount = result['data']['item'][4][9]  # amount from item[1]
 
                     maxAmount = max(item_0_amount, item_1_amount, item_2_amount, item_3_amount, item_4_amount)
-                    avgAmount = (item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / 5
+                    avgAmount = (item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / MAX_WEEK_COUNT
 
                     # 计算指标
                     indicator = maxAmount / avgAmount
@@ -61,9 +62,9 @@ class AnalyzeData:
 
                 bk_table = bk_table.append({
                     'code': Utils.T2Bcode(row[0]),
-                    'last_week_amount': item_1_amount,
+                    'last_week_amount': item_3_amount,
                     'indicator': str(indicator),
-                    'percent': result['data']['item'][0][7],
+                    'last_week_percent': result['data']['item'][3][7],
                 }, ignore_index=True)
 
                 count = count + 1
