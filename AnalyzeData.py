@@ -30,7 +30,9 @@ class AnalyzeData:
 
         url = "https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol={}&begin={}&period=week&type=before&count=-{}&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance"
         all_stock_keys = Utils.readFromCSV('stocks')
-        stock_keys = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
+        remove_bj = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
+        stock_keys = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
+        Utils.saveCSVToCache(stock_keys, 'test')
 
         # 制表保存
         bk_table = pd.DataFrame(columns=['code', 'last_week_amount', 'indicator', 'last_week_percent'])
@@ -60,7 +62,8 @@ class AnalyzeData:
                     item_4_amount = result['data']['item'][4][9]  # amount from item[1]
 
                     maxAmount = max(item_0_amount, item_1_amount, item_2_amount, item_3_amount, item_4_amount)
-                    avgAmount = (item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / MAX_WEEK_COUNT
+                    avgAmount = (
+                                            item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / MAX_WEEK_COUNT
 
                     # 计算指标
                     indicator = maxAmount / avgAmount
