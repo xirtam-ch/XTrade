@@ -1,21 +1,17 @@
 import json
 import os
-import random
+import re
 import time
 from datetime import timedelta, datetime
-from time import sleep
-import baostock as bs
 
-import openpyxl
+import baostock as bs
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from pysnowball import api_ref, utls
+from pysnowball import utls
 
 from C import C
 from Utils import Utils
-import re
-import pysnowball as ball
 
 
 class AnalyzeData:
@@ -34,54 +30,57 @@ class AnalyzeData:
         stock_keys = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
 
         # 制表保存
-        bk_table = pd.DataFrame(columns=['code', 'last_week_amount', 'indicator', 'last_week_percent', 'price'])
+        bk_table = pd.DataFrame(columns=['code', 'name', 'last_week_amount', 'indicator', 'last_week_percent', 'price'])
 
         count = 1
         MAX_WEEK_COUNT = 5
-        try:
-            for row in stock_keys.iterrows():
-                result = utls.fetch(url.format(Utils.T2Bcode(row[0]), int(time.time() * 1000), MAX_WEEK_COUNT))
+        # try:
+        for row in stock_keys.iterrows():
+            result = utls.fetch(url.format(Utils.T2Bcode(row[0]), int(time.time() * 1000), MAX_WEEK_COUNT))
 
-                if len(result['data']['item']) < MAX_WEEK_COUNT:
-                    print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}，新股无法计算')
-                    indicator = -1
+            if len(result['data']['item']) < MAX_WEEK_COUNT:
+                print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}，新股无法计算')
+                indicator = -1
 
-                    bk_table = bk_table.append({
-                        'code': Utils.T2Bcode(row[0]),
-                        'last_week_amount': -1,
-                        'indicator': str(indicator),
-                        'last_week_percent': -1,
-                        'price': -1,
-                    }, ignore_index=True)
+                tmp_data = pd.DataFrame([{
+                    'code': Utils.T2Bcode(row[0]),
+                    'name': stock_keys.loc[row[0]]['name'],
+                    'last_week_amount': -1,
+                    'indicator': str(indicator),
+                    'last_week_percent': -1,
+                    'price': -1,
+                }])
+                bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
 
-                else:
-                    item_0_amount = result['data']['item'][0][9]  # amount from item[0]
-                    item_1_amount = result['data']['item'][1][9]  # amount from item[1]
-                    item_2_amount = result['data']['item'][2][9]  # amount from item[1]
-                    item_3_amount = result['data']['item'][3][9]  # amount from item[1]
-                    item_4_amount = result['data']['item'][4][9]  # amount from item[1]
+            else:
+                item_0_amount = result['data']['item'][0][9]  # amount from item[0]
+                item_1_amount = result['data']['item'][1][9]  # amount from item[1]
+                item_2_amount = result['data']['item'][2][9]  # amount from item[1]
+                item_3_amount = result['data']['item'][3][9]  # amount from item[1]
+                item_4_amount = result['data']['item'][4][9]  # amount from item[1]
 
-                    maxAmount = max(item_0_amount, item_1_amount, item_2_amount, item_3_amount, item_4_amount)
-                    avgAmount = (
-                                        item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / MAX_WEEK_COUNT
+                maxAmount = max(item_0_amount, item_1_amount, item_2_amount, item_3_amount, item_4_amount)
+                avgAmount = (
+                                    item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / MAX_WEEK_COUNT
 
-                    # 计算指标
-                    indicator = maxAmount / avgAmount
+                # 计算指标
+                indicator = maxAmount / avgAmount
 
-                    # 进度条
-                    print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
+                # 进度条
+                print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
 
-                    bk_table = bk_table.append({
-                        'code': Utils.T2Bcode(row[0]),
-                        'last_week_amount': item_3_amount,
-                        'indicator': str(indicator),
-                        'last_week_percent': result['data']['item'][3][7],
-                        'price': result['data']['item'][4][5]
-                    }, ignore_index=True)
-
-                count = count + 1
-        except Exception as e:
-            print(f"出现异常: {e}")
+                tmp_data = pd.DataFrame([{
+                    'code': Utils.T2Bcode(row[0]),
+                    'name': stock_keys.loc[row[0]]['name'],
+                    'last_week_amount': item_3_amount,
+                    'indicator': str(indicator),
+                    'last_week_percent': result['data']['item'][3][7],
+                    'price': result['data']['item'][4][5]
+                }])
+                bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
+            count = count + 1
+        # except Exception as e:
+        #     print(f"出现异常: {e}")
 
         Utils.saveCSVToCache(bk_table, 'last_week_activity_' + date)
         return bk_table
@@ -154,14 +153,15 @@ class AnalyzeData:
             for i in range(0, group + 1):
                 data = ball.quotec(symbols[i])
                 for item in data['data']:
-                    bk_table = bk_table.append({
+                    tmp_data = pd.DataFrame([{
                         'code': item['symbol'],
                         'name': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + item['symbol'] + "\">" +
                                 bk_keys.loc[Utils.B2Tcode(item['symbol'])]['name'] + "</a>",
                         'amount': item['amount'],
                         'percent': item['percent'],
                         'current_year_percent': item['current_year_percent'],
-                    }, ignore_index=True)
+                    }])
+                    bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
             Utils.saveCSVToCache(bk_table, 'today_stocks_' + date)
 
         # 排除ST
@@ -224,7 +224,7 @@ class AnalyzeData:
                 flows = ball.capital_assort(code)
                 item = data['data'][0]
                 flow = flows['data']
-                bk_table = bk_table.append({
+                tmp_data = pd.DataFrame([{
                     'code': code,
                     'name': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + name + "\">site</a>",
                     'percent': item['percent'],
@@ -238,7 +238,8 @@ class AnalyzeData:
                     'small': Utils.divFormat(Utils.minusFormat(flow['buy_small'], flow['sell_small']),
                                              Utils.minusFormat(flow['buy_total'], flow['sell_total'])),
                     '': Utils.divFormat(flow['sell_small'], flow['sell_total']),
-                }, ignore_index=True)
+                }])
+                bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
 
         Utils.saveCSVToCache(bk_table, 'today_flow_' + date)
 
@@ -305,13 +306,14 @@ class AnalyzeData:
         for i in range(0, group):
             data = ball.quotec(symbols[i])
             for item in data['data']:
-                bk_table = bk_table.append({
+                tmp_data = pd.DataFrame([{
                     'code': item['symbol'],
                     'name': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + item['symbol'] + "\">" +
                             bk_keys.loc[item['symbol']]['name'] + "</a>",
                     'percent': item['percent'],
                     'current_year_percent': item['current_year_percent'],
-                }, ignore_index=True)
+                }])
+                bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
 
         Utils.saveCSVToCache(bk_table, 'today_bks_' + date)
 
@@ -484,13 +486,14 @@ class AnalyzeData:
         for code in codes:
             data = ball.quotec(Utils.T2Bcode(code))
             for item in data['data']:
-                resultTable = resultTable.append({
+                tmp_data = pd.DataFrame([{
                     'name': "<a target=\"_blank\" href=\"" + "https://xueqiu.com/S/" + item['symbol'] + "\">" +
                             bk_keys.loc[Utils.B2Tcode(item['symbol'])]['name'] + "</a>",
                     'amount': item['amount'],
                     'percent': item['percent'],
                     'current_year_percent': item['current_year_percent'],
-                }, ignore_index=True)
+                }])
+                bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
 
         return resultTable
 
