@@ -33,32 +33,37 @@ class AnalyzeData:
         stock_keys = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
 
         # 制表保存
-        bk_table = pd.DataFrame(columns=['code', 'amount', 'indicator'])
+        bk_table = pd.DataFrame(columns=['code', 'last_week_amount', 'indicator', 'percent'])
 
-        count = 0
+        count = 1
         try:
             for row in stock_keys.iterrows():
-                result = utls.fetch(url.format(Utils.T2Bcode(row[0]), int(time.time() * 1000), 3))
+                result = utls.fetch(url.format(Utils.T2Bcode(row[0]), int(time.time() * 1000), 5))
 
-                if len(result['data']['item']) < 3:
+                if len(result['data']['item']) < 5:
                     print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}，新股无法计算')
                     indicator = -1
                 else:
                     item_0_amount = result['data']['item'][0][9]  # amount from item[0]
                     item_1_amount = result['data']['item'][1][9]  # amount from item[1]
+                    item_2_amount = result['data']['item'][2][9]  # amount from item[1]
+                    item_3_amount = result['data']['item'][3][9]  # amount from item[1]
+                    item_4_amount = result['data']['item'][4][9]  # amount from item[1]
+
+                    maxAmount = max(item_0_amount, item_1_amount, item_2_amount, item_3_amount, item_4_amount)
+                    avgAmount = (item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / 5
 
                     # 计算指标
-                    if item_0_amount is not None and item_1_amount is not None and item_0_amount != 0:
-                        indicator = item_1_amount / item_0_amount
-                        print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
-                    else:
-                        indicator = -1
-                        print("无法计算指标，因为数据缺失或分母为零。")
+                    indicator = maxAmount / avgAmount
+
+                    # 进度条
+                    print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
 
                 bk_table = bk_table.append({
                     'code': Utils.T2Bcode(row[0]),
-                    'amount': item_1_amount,
-                    'indicator': indicator,
+                    'last_week_amount': item_1_amount,
+                    'indicator': str(indicator),
+                    'percent': result['data']['item'][0][7],
                 }, ignore_index=True)
 
                 count = count + 1
