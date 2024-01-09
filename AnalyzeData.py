@@ -53,18 +53,29 @@ class AnalyzeData:
                 bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
 
             else:
-                item_0_amount = result['data']['item'][0][9]  # amount from item[0]
-                item_1_amount = result['data']['item'][1][9]  # amount from item[1]
-                item_2_amount = result['data']['item'][2][9]  # amount from item[1]
-                item_3_amount = result['data']['item'][3][9]  # amount from item[1]
-                item_4_amount = result['data']['item'][4][9]  # amount from item[1]
+                item_0_amount = result['data']['item'][0][9]
+                item_1_amount = result['data']['item'][1][9]
+                item_2_amount = result['data']['item'][2][9]
+                item_3_amount = result['data']['item'][3][9]  # 上周的
+                item_4_amount = result['data']['item'][4][9]  # 本周的
 
-                maxAmount = max(item_0_amount, item_1_amount, item_2_amount, item_3_amount, item_4_amount)
+                # maxAmount = max(item_0_amount, item_1_amount, item_2_amount, item_3_amount, item_4_amount) #取过去5周最大成交量
+                maxAmount = item_3_amount  # 取上周成交量
                 avgAmount = (
                                     item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / MAX_WEEK_COUNT
 
+                # 计算上影线长度 (high - close - (open - low)) / (close - open)
+                upper_shadow_line = 0
+                if (result['data']['item'][3][5] - result['data']['item'][3][2]) > 0:  # 上周是上涨的
+                    upper_shadow_line = ((result['data']['item'][3][3] - result['data']['item'][3][5]) -
+                                         (result['data']['item'][3][2] - result['data']['item'][3][4])) \
+                                        / (result['data']['item'][3][5] - result['data']['item'][3][2])
+
+                amount_indicator = 0
+                if maxAmount > 500000000:  # 成交额5亿以上
+                    amount_indicator = maxAmount / avgAmount
                 # 计算指标
-                indicator = maxAmount / avgAmount
+                indicator = amount_indicator + upper_shadow_line
 
                 # 进度条
                 print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
