@@ -75,7 +75,10 @@ class AnalyzeData:
                 if maxAmount > 500000000:  # 成交额5亿以上
                     amount_indicator = maxAmount / avgAmount
                 # 计算指标
-                indicator = amount_indicator + upper_shadow_line
+
+                indicator = -1
+                if amount_indicator > 2:  # 放量达2倍以上
+                    indicator = upper_shadow_line
 
                 # 进度条
                 print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
