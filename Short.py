@@ -58,7 +58,7 @@ if __name__ == '__main__':
     filtered_df = last_week_activity[last_week_activity['last_week_percent'] > 0]
 
     # 根据 indicator 列从大到小排序，然后取前50条记录
-    sorted_filtered_df = filtered_df.sort_values(by='indicator', ascending=False).head(50).reset_index()
+    sorted_filtered_df = filtered_df.sort_values(by='indicator', ascending=False).head(100).reset_index()
 
     # print(sorted_filtered_df)
 
