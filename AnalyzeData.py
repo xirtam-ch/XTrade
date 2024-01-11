@@ -59,17 +59,21 @@ class AnalyzeData:
                 item_3_amount = result['data']['item'][3][9]  # 上周的
                 item_4_amount = result['data']['item'][4][9]  # 本周的
 
+                execWeekData = result['data']['item'][3]
+                if datetime.now().weekday() >= 4:  # 周五以后使用本周数据作为最后一周，周五以前使用上周数据作为最后一周
+                    execWeekData = result['data']['item'][4]
+
                 # maxAmount = max(item_0_amount, item_1_amount, item_2_amount, item_3_amount, item_4_amount) #取过去5周最大成交量
-                maxAmount = item_3_amount  # 取上周成交量
-                avgAmount = (
-                                    item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) / MAX_WEEK_COUNT
+                maxAmount = execWeekData[9]  # 取最后一周成交量
+                avgAmount = (item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) \
+                            / MAX_WEEK_COUNT
 
                 # 计算上影线长度 (high - close - (open - low)) / (close - open)
                 upper_shadow_line = 0
-                if (result['data']['item'][3][5] - result['data']['item'][3][2]) > 0:  # 上周是上涨的
-                    upper_shadow_line = ((result['data']['item'][3][3] - result['data']['item'][3][5]) -
-                                         (result['data']['item'][3][2] - result['data']['item'][3][4])) \
-                                        / (result['data']['item'][3][5] - result['data']['item'][3][2])
+                if (execWeekData[5] - execWeekData[2]) > 0:  # 最后一周是上涨的
+                    upper_shadow_line = ((execWeekData[3] - execWeekData[5]) -
+                                         (execWeekData[2] - execWeekData[4])) \
+                                        / (execWeekData[5] - execWeekData[2])
 
                 amount_indicator = 0
                 if maxAmount > 500000000:  # 成交额5亿以上
@@ -86,10 +90,10 @@ class AnalyzeData:
                 tmp_data = pd.DataFrame([{
                     'code': Utils.T2Bcode(row[0]),
                     'name': stock_keys.loc[row[0]]['name'],
-                    'last_week_amount': item_3_amount,
+                    'last_week_amount': execWeekData[9],
                     'indicator': str(indicator),
-                    'last_week_percent': result['data']['item'][3][7],
-                    'price': result['data']['item'][4][5]
+                    'last_week_percent': execWeekData[7],
+                    'price': result['data']['item'][4][5]  # 最新价格始终使用最后一周的
                 }])
                 bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
             count = count + 1
