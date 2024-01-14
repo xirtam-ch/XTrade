@@ -77,7 +77,7 @@ class AnalyzeData:
                                         / (execWeekData[5] - execWeekData[2])
 
                 amount_indicator = 0
-                if avgAmount > 800000000:  # 平均成交额大于8亿
+                if avgAmount > 600000000:  # 平均成交额大于8亿
                     amount_indicator = maxAmount / avgAmount
 
                 # 计算指标
