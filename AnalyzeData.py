@@ -67,6 +67,7 @@ class AnalyzeData:
                 maxAmount = execWeekData[9]  # 取最后一周成交量
                 avgAmount = (item_0_amount + item_1_amount + item_2_amount + item_3_amount + item_4_amount) \
                             / MAX_WEEK_COUNT
+                minAmout = min(item_0_amount, item_1_amount, item_2_amount, item_3_amount, item_4_amount)
 
                 # 计算上影线长度 (high - close - (open - low)) / (close - open)
                 upper_shadow_line = 0
@@ -76,10 +77,10 @@ class AnalyzeData:
                                         / (execWeekData[5] - execWeekData[2])
 
                 amount_indicator = 0
-                if avgAmount > 800000000:  # 平均成交额8亿以上
+                if minAmout > 500000000:  # 最小成交额5亿以上
                     amount_indicator = maxAmount / avgAmount
-                # 计算指标
 
+                # 计算指标
                 indicator = -1
                 if amount_indicator > 2:  # 放量达2倍以上
                     indicator = upper_shadow_line
