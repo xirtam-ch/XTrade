@@ -105,6 +105,16 @@ class AnalyzeData:
         return bk_table
 
     @staticmethod
+    def getWeekPercentBySymbols(symbols):
+        result_list = []
+        url = "https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol={}&begin={}&period=week&type=before&count=-{}&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance"
+
+        for code in symbols:
+            data = utls.fetch(url.format(code, int(time.time() * 1000), 1))
+            result_list.append(data['data']['item'][0][7])
+        return result_list
+
+    @staticmethod
     def getStocks(ball):
         date = time.strftime("%Y-%m-%d", time.localtime())
 
