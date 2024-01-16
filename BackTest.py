@@ -19,10 +19,12 @@ if __name__ == '__main__':
     # 遍历每行并打印第一列的后8位字符串
     for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=1, max_col=1, values_only=True):
         first_column_value = str(row[0])
-        if first_column_value == '表格 1' or first_column_value == '名称' or first_column_value == '' or first_column_value is None:
+        if first_column_value == '表格 1' or first_column_value == '名称' or first_column_value == '' or first_column_value is None or first_column_value == 'None':
             continue
         last_eight_characters = first_column_value[-8:]  # 获取后8位字符
         result_list.append(last_eight_characters)
+
+    print(f'result_list {result_list}')
 
     print('开始获取行情数据...')
     prices = AnalyzeData.getWeekPercentBySymbols(result_list)
