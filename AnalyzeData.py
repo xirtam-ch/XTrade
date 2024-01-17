@@ -36,22 +36,36 @@ class AnalyzeData:
         MAX_WEEK_COUNT = 5
         # try:
         for row in stock_keys.iterrows():
-            result = utls.fetch(url.format(Utils.T2Bcode(row[0]), int(time.time() * 1000), MAX_WEEK_COUNT))
+            code = Utils.T2Bcode(row[0])
+            result = utls.fetch(url.format(code, int(time.time() * 1000), MAX_WEEK_COUNT))
 
-            if len(result['data']['item']) < MAX_WEEK_COUNT:
-                print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}，新股无法计算')
-                indicator = -1
+            # ['timestamp', 'volume', 'open', 'high', 'low',
+            # 'close', 'chg', 'percent', 'turnoverrate', 'amount',
+            # 'volume_post', 'amount_post', 'pe', 'pb', 'ps',
+            # 'pcf', 'market_capital', 'balance', 'hold_volume_cn', 'hold_ratio_cn',
+            # 'net_volume_cn', 'hold_volume_hk', 'hold_ratio_hk', 'net_volume_hk']
 
-                tmp_data = pd.DataFrame([{
-                    'code': Utils.T2Bcode(row[0]),
-                    'name': stock_keys.loc[row[0]]['name'],
-                    'last_week_amount': -1,
-                    'indicator': str(indicator),
-                    'last_week_percent': -1,
-                    'price': -1,
-                }])
-                bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
+            if len(result['data']['item']) < MAX_WEEK_COUNT:  # 次新股排除
+                print(f'{code} 次新股排除')
+                continue
 
+            market_capital = result['data']['item'][4][16]
+
+            if market_capital is None :  # 获取不到市值
+                print(f'{code} 获取不到市值')
+            elif market_capital < 5000000000:  # 市值小于50亿
+                print(f'{code} 市值小于50亿')
+                # indicator = -1
+                # print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}，新股无法计算')
+                # tmp_data = pd.DataFrame([{
+                #     'code': Utils.T2Bcode(row[0]),
+                #     'name': stock_keys.loc[row[0]]['name'],
+                #     'last_week_amount': -1,
+                #     'indicator': str(indicator),
+                #     'last_week_percent': -1,
+                #     'price': -1,
+                # }])
+                # bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
             else:
                 item_0_amount = result['data']['item'][0][9]
                 item_1_amount = result['data']['item'][1][9]
@@ -94,6 +108,7 @@ class AnalyzeData:
                     'last_week_amount': execWeekData[9],
                     'indicator': str(indicator),
                     'last_week_percent': execWeekData[7],
+                    'market_capital': market_capital,
                     'price': result['data']['item'][4][5]  # 最新价格始终使用最后一周的
                 }])
                 bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
