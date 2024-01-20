@@ -36,6 +36,6 @@ if __name__ == '__main__':
             break
 
     for index, value in enumerate(prices, start=1):
-        sheet.cell(row=index + 2, column=result_column_index, value=value)
+        sheet.cell(row=index + 1, column=result_column_index, value=value)
     workbook.save(file_path)
     print('补充行情成功')
