@@ -51,7 +51,7 @@ class AnalyzeData:
 
             market_capital = result['data']['item'][4][16]
 
-            if market_capital is None :  # 获取不到市值
+            if market_capital is None:  # 获取不到市值
                 print(f'{code} 获取不到市值')
             elif market_capital < 5000000000:  # 市值小于50亿
                 print(f'{code} 市值小于50亿')
@@ -115,6 +115,63 @@ class AnalyzeData:
         #     print(f"出现异常: {e}")
 
         Utils.saveCSVToCache(bk_table, 'last_week_activity_' + date)
+        return bk_table
+
+    @staticmethod
+    def get_two_day_kline():
+        date = time.strftime("%Y-%m-%d", time.localtime())
+
+        if os.path.exists(os.path.join(C.CACHE_PATH + 'two_day_kline' + date + '.csv')):
+            print(f'get_last_day_percent 使用缓存')
+            return Utils.readCSVFromCache('two_day_kline' + date)
+
+        url = "https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol={}&begin={}&period=day&type=before&count=-{}&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance"
+        all_stock_keys = Utils.readFromCSV('stocks')  # stocks_test
+        remove_bj = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
+        stock_keys = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
+
+        # 制表保存
+        bk_table = pd.DataFrame()
+
+        count = 1
+        MAX_WEEK_COUNT = 2
+        # try:
+        for row in stock_keys.iterrows():
+            code = Utils.T2Bcode(row[0])
+            result = utls.fetch(url.format(code, int(time.time() * 1000), MAX_WEEK_COUNT))
+
+            # ['timestamp', 'volume', 'open', 'high', 'low',
+            # 'close', 'chg', 'percent', 'turnoverrate', 'amount',
+            # 'volume_post', 'amount_post', 'pe', 'pb', 'ps',
+            # 'pcf', 'market_capital', 'balance', 'hold_volume_cn', 'hold_ratio_cn',
+            # 'net_volume_cn', 'hold_volume_hk', 'hold_ratio_hk', 'net_volume_hk']
+
+            today_data = result['data']['item'][1]
+            yestday_data = result['data']['item'][0]
+            # 进度条
+            print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
+
+            tmp_data = pd.DataFrame([{
+                'code': Utils.T2Bcode(row[0]),
+                'name': stock_keys.loc[row[0]]['name'],
+                'last_open': yestday_data[2],
+                'last_high': yestday_data[3],
+                'last_low': yestday_data[4],
+                'last_close': yestday_data[5],
+                'last_amount': yestday_data[9],
+                'last_percent': yestday_data[7],
+                'open': today_data[2],
+                'high': today_data[3],
+                'low': today_data[4],
+                'close': today_data[5],
+                'amount': today_data[9],
+                'percent': today_data[7],
+                'market_capital': today_data[16]
+            }])
+            bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
+            count = count + 1
+
+        Utils.saveCSVToCache(bk_table, 'two_day_kline' + date)
         return bk_table
 
     @staticmethod
