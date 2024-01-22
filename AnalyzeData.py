@@ -118,10 +118,10 @@ class AnalyzeData:
         return bk_table
 
     @staticmethod
-    def get_two_day_kline():
+    def get_days_kline():
         date = time.strftime("%Y-%m-%d", time.localtime())
 
-        if os.path.exists(os.path.join(C.CACHE_PATH + 'two_day_kline' + date + '.csv')):
+        if os.path.exists(os.path.join(C.CACHE_PATH + 'days_kline' + date + '.csv')):
             print(f'get_last_day_percent 使用缓存')
             return Utils.readCSVFromCache('two_day_kline_' + date)
 
@@ -134,7 +134,7 @@ class AnalyzeData:
         bk_table = pd.DataFrame()
 
         count = 1
-        MAX_WEEK_COUNT = 2
+        MAX_WEEK_COUNT = 3
         # try:
         for row in stock_keys.iterrows():
             code = Utils.T2Bcode(row[0])
@@ -146,8 +146,9 @@ class AnalyzeData:
             # 'pcf', 'market_capital', 'balance', 'hold_volume_cn', 'hold_ratio_cn',
             # 'net_volume_cn', 'hold_volume_hk', 'hold_ratio_hk', 'net_volume_hk']
 
-            today_data = result['data']['item'][1]
-            yestday_data = result['data']['item'][0]
+            today_data = result['data']['item'][2]
+            yestday_data = result['data']['item'][1]
+            last2day_data = result['data']['item'][0]
             # 进度条
             print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
 
@@ -160,6 +161,12 @@ class AnalyzeData:
                 'last_close': yestday_data[5],
                 'last_amount': yestday_data[9],
                 'last_percent': yestday_data[7],
+                'last2_open': last2day_data[2],
+                'last2_high': last2day_data[3],
+                'last2_low': last2day_data[4],
+                'last2_close': last2day_data[5],
+                'last2_amount': last2day_data[9],
+                'last2_percent': last2day_data[7],
                 'open': today_data[2],
                 'high': today_data[3],
                 'low': today_data[4],
@@ -171,7 +178,7 @@ class AnalyzeData:
             bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
             count = count + 1
 
-        Utils.saveCSVToCache(bk_table, 'two_day_kline_' + date)
+        Utils.saveCSVToCache(bk_table, 'days_kline' + date)
         return bk_table
 
     @staticmethod

@@ -27,7 +27,7 @@ if __name__ == '__main__':
     prepare()
     date = time.strftime("%Y-%m-%d", time.localtime())
 
-    kline_data = AnalyzeData.get_two_day_kline()
+    kline_data = AnalyzeData.get_day_kline()
     # print(kline_data)
 
     # 筛选数据，小市值
