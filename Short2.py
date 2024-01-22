@@ -28,19 +28,27 @@ if __name__ == '__main__':
     date = time.strftime("%Y-%m-%d", time.localtime())
 
     kline_data = AnalyzeData.get_two_day_kline()
-    print(kline_data)
+    # print(kline_data)
 
     # 筛选数据，小市值
-    filtered_df = kline_data[kline_data['market_capital'] < 50 * 10000 * 10000]
+    filtered_df = kline_data[kline_data['market_capital'] < 200 * 10000 * 10000]
+    print(f'小市值{filtered_df.shape[0]}')
 
-    # 筛选数据，小成交量
-    filtered_df = filtered_df[filtered_df['last_amount'] < 1 * 10000 * 10000]
+    # 筛选数据，放量
+    filtered_df = filtered_df[filtered_df['amount'] / filtered_df['last_amount'] > 2]
+    print(f'放量{filtered_df.shape[0]}')
 
-    # 筛选数据，昨天下跌的
-    filtered_df = filtered_df[filtered_df['last_percent'] < -2]
+    # 筛选数据，昨日跌过
+    filtered_df = filtered_df[filtered_df['last_open'] / filtered_df['last_low'] > 1.02]
+    print(f'昨日跌过{filtered_df.shape[0]}')
 
-    # 筛选数据，今日高开的
-    filtered_df = filtered_df[filtered_df['open'] / filtered_df['last_close'] > 1.02]
+    # 筛选数据，今日涨
+    filtered_df = filtered_df[filtered_df['percent'] >1.3]
+    print(f'今日涨{filtered_df.shape[0]}')
+
+    # 筛选数据，今日上影
+    filtered_df = filtered_df[filtered_df['high'] / filtered_df['close'] > 1.02]
+    print(f'今日上影{filtered_df.shape[0]}')
 
     filtered_df = filtered_df.reset_index()
 
@@ -54,7 +62,7 @@ if __name__ == '__main__':
         code = row['code']
         name = row['name']
         price = row['close']
-        indicator = (row['open'] / row['last_close']) * abs(row['percent'])
+        indicator = (row['high'] / row['close']) * (row['last_open'] / row['last_low'])
 
         # print(sheet)
         # 将数据填充到 Excel 文件中的相应列
