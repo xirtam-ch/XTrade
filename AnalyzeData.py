@@ -121,9 +121,9 @@ class AnalyzeData:
     def get_days_kline():
         date = time.strftime("%Y-%m-%d", time.localtime())
 
-        if os.path.exists(os.path.join(C.CACHE_PATH + 'days_kline' + date + '.csv')):
+        if os.path.exists(os.path.join(C.CACHE_PATH + 'days_kline_' + date + '.csv')):
             print(f'get_last_day_percent 使用缓存')
-            return Utils.readCSVFromCache('two_day_kline_' + date)
+            return Utils.readCSVFromCache('days_kline_' + date)
 
         url = "https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol={}&begin={}&period=day&type=before&count=-{}&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance"
         all_stock_keys = Utils.readFromCSV('stocks')  # stocks_test
@@ -178,7 +178,7 @@ class AnalyzeData:
             bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
             count = count + 1
 
-        Utils.saveCSVToCache(bk_table, 'days_kline' + date)
+        Utils.saveCSVToCache(bk_table, 'days_kline_' + date)
         return bk_table
 
     @staticmethod
