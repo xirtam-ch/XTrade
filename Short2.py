@@ -39,11 +39,11 @@ if __name__ == '__main__':
     # print(f'昨日跌过{filtered_df.shape[0]}')
 
     # 筛选数据，今日红
-    filtered_df = kline_data[(kline_data['close'] - kline_data['open']) > 0]
+    filtered_df = kline_data[(kline_data['close'] / kline_data['open']) > 1.02]
     print(f'今日红{filtered_df.shape[0]}')
 
     # 筛选数据，昨日绿
-    filtered_df = filtered_df[filtered_df['last_close'] - filtered_df['last_open'] < 0]
+    filtered_df = filtered_df[filtered_df['last_open'] / filtered_df['last_close'] > 1.02]
     print(f'昨日绿{filtered_df.shape[0]}')
     #
     # 筛选数据，今日上影
@@ -55,12 +55,16 @@ if __name__ == '__main__':
     print(f'昨日下影{filtered_df.shape[0]}')
 
     # 筛选数据，放量
-    filtered_df = filtered_df[filtered_df['amount'] / filtered_df['last_amount'] > 2]
+    filtered_df = filtered_df[filtered_df['amount'] / filtered_df['last_amount'] > 1]
     print(f'放量{filtered_df.shape[0]}')
 
     # 筛选数据，高开
-    filtered_df = filtered_df[filtered_df['open'] / filtered_df['last_close'] > 1]
+    filtered_df = filtered_df[filtered_df['open'] / filtered_df['last_close'] > 1.01]
     print(f'高开{filtered_df.shape[0]}')
+
+    # 筛选数据，跳开
+    filtered_df = filtered_df[filtered_df['close'] / filtered_df['last_open'] > 1]
+    print(f'跳开{filtered_df.shape[0]}')
 
     filtered_df = filtered_df.reset_index()
 
@@ -75,16 +79,16 @@ if __name__ == '__main__':
         name = row['name']
         price = row['close']
         indicator = abs(
-            (row['last_close'] - row['last_low']) / (row['last_open'] - row['last_close']) - 0.382)  # 昨下影/昨柱
-        + abs((row['high'] - row['open']) / (row['close'] - row['open']) - 0.382)  # 今上影/今柱
-
-        # print(sheet)
-        # 将数据填充到 Excel 文件中的相应列
-        name_cell = sheet.cell(row=index + 1, column=1, value=f'{name} {str(code)}')
-        name_cell.hyperlink = f'https://xueqiu.com/S/{code}'
-        sheet.cell(row=index + 1, column=2, value=round(float(indicator), 2))
-        sheet.cell(row=index + 1, column=3, value=price)
-        index = index + 1
+            (row['last_close'] - row['last_low']) / (row['last_open'] - row['last_close']) - 0.382) + abs(
+            (row['high'] - row['close']) / (row['close'] - row['open']) - 0.382)
+        if indicator < 0.3: #
+            # print(sheet)
+            # 将数据填充到 Excel 文件中的相应列
+            name_cell = sheet.cell(row=index + 1, column=1, value=f'{name} {str(code)}')
+            name_cell.hyperlink = f'https://xueqiu.com/S/{code}'
+            sheet.cell(row=index + 1, column=2, value=round(float(indicator), 2))
+            sheet.cell(row=index + 1, column=3, value=price)
+            index = index + 1
 
     # # 保存修改后的 Excel 文件
     wb.save(f'{C.XLS_OUTPUT_PATH}short2_{date}.xlsx')
