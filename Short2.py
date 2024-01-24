@@ -31,24 +31,36 @@ if __name__ == '__main__':
     # print(kline_data)
 
     # 筛选数据，小市值
-    filtered_df = kline_data[kline_data['market_capital'] < 200 * 10000 * 10000]
-    print(f'小市值{filtered_df.shape[0]}')
+    # filtered_df = kline_data[kline_data['market_capital'] < 200 * 10000 * 10000]
+    # print(f'小市值{filtered_df.shape[0]}')
+
+    # 筛选数据，昨日跌过
+    # filtered_df = filtered_df[filtered_df['last_open'] / filtered_df['last_low'] > 1.02]
+    # print(f'昨日跌过{filtered_df.shape[0]}')
+
+    # 筛选数据，今日红
+    filtered_df = kline_data[(kline_data['close'] - kline_data['open']) > 0]
+    print(f'今日红{filtered_df.shape[0]}')
+
+    # 筛选数据，昨日绿
+    filtered_df = filtered_df[filtered_df['last_close'] - filtered_df['last_open'] < 0]
+    print(f'昨日绿{filtered_df.shape[0]}')
+    #
+    # 筛选数据，今日上影
+    filtered_df = filtered_df[filtered_df['high'] / filtered_df['close'] > 1.005]
+    print(f'今日上影{filtered_df.shape[0]}')
+
+    # 筛选数据，昨日下影
+    filtered_df = filtered_df[filtered_df['last_close'] / filtered_df['last_low'] > 1.005]
+    print(f'昨日下影{filtered_df.shape[0]}')
 
     # 筛选数据，放量
     filtered_df = filtered_df[filtered_df['amount'] / filtered_df['last_amount'] > 2]
     print(f'放量{filtered_df.shape[0]}')
 
-    # 筛选数据，昨日跌过
-    filtered_df = filtered_df[filtered_df['last_open'] / filtered_df['last_low'] > 1.02]
-    print(f'昨日跌过{filtered_df.shape[0]}')
-
-    # 筛选数据，今日涨
-    filtered_df = filtered_df[filtered_df['percent'] >1.3]
-    print(f'今日涨{filtered_df.shape[0]}')
-
-    # 筛选数据，今日上影
-    filtered_df = filtered_df[filtered_df['high'] / filtered_df['close'] > 1.02]
-    print(f'今日上影{filtered_df.shape[0]}')
+    # 筛选数据，高开
+    filtered_df = filtered_df[filtered_df['open'] / filtered_df['last_close'] > 1]
+    print(f'高开{filtered_df.shape[0]}')
 
     filtered_df = filtered_df.reset_index()
 
@@ -62,7 +74,9 @@ if __name__ == '__main__':
         code = row['code']
         name = row['name']
         price = row['close']
-        indicator = (row['high'] / row['close']) * (row['last_open'] / row['last_low'])
+        indicator = abs(
+            (row['last_close'] - row['last_low']) / (row['last_open'] - row['last_close']) - 0.382)  # 昨下影/昨柱
+        + abs((row['high'] - row['open']) / (row['close'] - row['open']) - 0.382)  # 今上影/今柱
 
         # print(sheet)
         # 将数据填充到 Excel 文件中的相应列
