@@ -26,9 +26,15 @@ def prepare():
 
 if __name__ == '__main__':
     prepare()
-    date = time.strftime("%Y-%m-%d", time.localtime())
 
+    # 昨天
+    # date = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 60 * 60))
+    # kline_data = AnalyzeData.get_days_kline(time.time() - 24 * 60 * 60)
+
+    # 今天
+    date = time.strftime("%Y-%m-%d", time.localtime())
     kline_data = AnalyzeData.get_days_kline()
+
     # print(kline_data)
 
     # 筛选数据，小市值
