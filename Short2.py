@@ -12,6 +12,7 @@ from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.formula.translate import Translator
 import pysnowball as ball
+import subprocess;
 
 
 def prepare():
@@ -81,15 +82,16 @@ if __name__ == '__main__':
         indicator = abs(
             (row['last_close'] - row['last_low']) / (row['last_open'] - row['last_close']) - 0.382) + abs(
             (row['high'] - row['close']) / (row['close'] - row['open']) - 0.382)
-        if indicator < 0.3: #
-            # print(sheet)
-            # 将数据填充到 Excel 文件中的相应列
-            name_cell = sheet.cell(row=index + 1, column=1, value=f'{name} {str(code)}')
-            name_cell.hyperlink = f'https://xueqiu.com/S/{code}'
-            sheet.cell(row=index + 1, column=2, value=round(float(indicator), 2))
-            sheet.cell(row=index + 1, column=3, value=price)
-            index = index + 1
+        # if indicator < 0.3: #
+        # print(sheet)
+        # 将数据填充到 Excel 文件中的相应列
+        name_cell = sheet.cell(row=index + 1, column=1, value=f'{name} {str(code)}')
+        name_cell.hyperlink = f'https://xueqiu.com/S/{code}'
+        sheet.cell(row=index + 1, column=2, value=round(float(indicator), 2))
+        sheet.cell(row=index + 1, column=3, value=price)
+        index = index + 1
 
     # # 保存修改后的 Excel 文件
     wb.save(f'{C.XLS_OUTPUT_PATH}short2_{date}.xlsx')
     wb.close()
+    subprocess.run(['say', '运行完毕，恭喜发财'])
