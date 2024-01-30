@@ -118,8 +118,8 @@ class AnalyzeData:
         return bk_table
 
     @staticmethod
-    def get_days_kline():
-        date = time.strftime("%Y-%m-%d", time.localtime())
+    def get_days_kline(timestamp=time.time()):
+        date = time.strftime("%Y-%m-%d", time.localtime(timestamp))
 
         if os.path.exists(os.path.join(C.CACHE_PATH + 'days_kline_' + date + '.csv')):
             print(f'get_last_day_percent 使用缓存')
