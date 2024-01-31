@@ -66,7 +66,7 @@ if __name__ == '__main__':
     print(f'放量{filtered_df.shape[0]}')
 
     # 筛选数据，高开
-    filtered_df = filtered_df[filtered_df['open'] / filtered_df['last_close'] > 1.01]
+    filtered_df = filtered_df[filtered_df['open'] / filtered_df['last_close'] > 1]
     print(f'高开{filtered_df.shape[0]}')
 
     # 筛选数据，跳开
