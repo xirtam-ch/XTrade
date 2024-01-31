@@ -46,19 +46,19 @@ if __name__ == '__main__':
     # print(f'昨日跌过{filtered_df.shape[0]}')
 
     # 筛选数据，今日红
-    filtered_df = kline_data[(kline_data['close'] / kline_data['open']) > 1.02]
+    filtered_df = kline_data[(kline_data['close'] / kline_data['open']) > 1.01]
     print(f'今日红{filtered_df.shape[0]}')
 
     # 筛选数据，昨日绿
-    filtered_df = filtered_df[filtered_df['last_open'] / filtered_df['last_close'] > 1.02]
+    filtered_df = filtered_df[filtered_df['last_open'] / filtered_df['last_close'] > 1.01]
     print(f'昨日绿{filtered_df.shape[0]}')
     #
     # 筛选数据，今日上影
-    filtered_df = filtered_df[filtered_df['high'] / filtered_df['close'] > 1.005]
+    filtered_df = filtered_df[filtered_df['high'] / filtered_df['close'] > 1]
     print(f'今日上影{filtered_df.shape[0]}')
 
     # 筛选数据，昨日下影
-    filtered_df = filtered_df[filtered_df['last_close'] / filtered_df['last_low'] > 1.005]
+    filtered_df = filtered_df[filtered_df['last_close'] / filtered_df['last_low'] > 1]
     print(f'昨日下影{filtered_df.shape[0]}')
 
     # 筛选数据，放量
