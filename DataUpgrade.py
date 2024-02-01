@@ -26,10 +26,15 @@ class DataUpgrade:
         all_stock_keys = Utils.readFromCSV('stocks')
         remove_bj = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
         stock_keys = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
-        bk_table = pd.DataFrame(columns=['code', 'name'])
 
         count = 1
         for row in stock_keys.iterrows():
+            if os.path.exists(os.path.join(C.WEEK_KLINE_PATH + f'{Utils.T2Bcode(row[0])}_{date}' + '.csv')):
+                print(f'{Utils.T2Bcode(row[0])} 使用缓存')
+                continue
+
+            bk_table = pd.DataFrame(columns=['code', 'name'])
+
             code = Utils.T2Bcode(row[0])
             result = utls.fetch(url.format(code, int(time.time() * 1000), 200))  # 200周k线
 
@@ -61,7 +66,7 @@ class DataUpgrade:
                 }])
                 bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data],
                                      ignore_index=True)
-            # bk_table = bk_table.set_index('timestamp')
+
             bk_table.to_csv(os.path.join(C.WEEK_KLINE_PATH + f'{Utils.T2Bcode(row[0])}_{date}' + '.csv'), index=False)
             # 进度条
             print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
