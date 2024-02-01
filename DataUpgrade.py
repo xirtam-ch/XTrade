@@ -31,6 +31,7 @@ class DataUpgrade:
         for row in stock_keys.iterrows():
             if os.path.exists(os.path.join(C.WEEK_KLINE_PATH + f'{Utils.T2Bcode(row[0])}_{date}' + '.csv')):
                 print(f'{Utils.T2Bcode(row[0])} 使用缓存')
+                count = count + 1
                 continue
 
             bk_table = pd.DataFrame(
