@@ -17,6 +17,92 @@ from Utils import Utils
 class AnalyzeData:
 
     @staticmethod
+    def get_weeks_low_vol(weeks=30):
+        date = time.strftime("%Y-%m-%d", time.localtime())
+
+        # if os.path.exists(os.path.join(C.CACHE_PATH + 'get_weeks_low_vol_' + date + '.csv')):
+        #     print(f'get_last_week_activity_index 使用缓存')
+        #     return Utils.readCSVFromCache('get_weeks_low_vol_' + date)
+
+        url = "https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol={}&begin={}&period=week&type=before&count=-{}&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance"
+        all_stock_keys = Utils.readFromCSV('stocks')
+        remove_bj = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
+        stock_keys = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
+
+        # 制表保存
+        bk_table = pd.DataFrame(columns=['code', 'name', 'last_week_amount', 'indicator', 'last_week_percent', 'price'])
+
+        count = 1
+        MAX_WEEK_COUNT = weeks
+        for row in stock_keys.iterrows():
+            code = Utils.T2Bcode(row[0])
+            result = utls.fetch(url.format(code, int(time.time() * 1000), MAX_WEEK_COUNT))
+
+            # ['timestamp', 'volume', 'open', 'high', 'low',
+            # 'close', 'chg', 'percent', 'turnoverrate', 'amount',
+            # 'volume_post', 'amount_post', 'pe', 'pb', 'ps',
+            # 'pcf', 'market_capital', 'balance', 'hold_volume_cn', 'hold_ratio_cn',
+            # 'net_volume_cn', 'hold_volume_hk', 'hold_ratio_hk', 'net_volume_hk']
+
+            if len(result['data']['item']) < MAX_WEEK_COUNT:  # 次新股排除
+                print(f'{code} 次新股排除')
+                continue
+
+            market_capital = result['data']['item'][4][16]
+
+            if market_capital is None:  # 获取不到市值
+                print(f'{code} 获取不到市值')
+            else:
+                filter_30_percent = 30
+                filter_10_percent = filter_30_percent / 3
+                filter_5_percent = filter_30_percent / 6
+                filter_3_percent = filter_30_percent / 10
+
+                this_week_vol = result['data']['item'][weeks - 1][1]
+
+                sum_30 = 0
+                sum_10 = 0
+                sum_5 = 0
+                sum_3 = 0
+
+                min8 = 2099999999
+
+                for i in range(0, weeks):
+                    if i >= weeks - 3:
+                        sum_3 = sum_3 + result['data']['item'][i][1]
+                    if i >= weeks - 5:
+                        sum_5 = sum_5 + result['data']['item'][i][1]
+                    if i >= weeks - 10:
+                        sum_10 = sum_10 + result['data']['item'][i][1]
+                    if i >= weeks - 30:
+                        sum_30 = sum_30 + result['data']['item'][i][1]
+                    if i < weeks - 1:
+                        if result['data']['item'][i][1] < min8:
+                            min8 = result['data']['item'][i][1]
+                # 计算指标
+                # if this_week_vol / sum_30 < 1 / filter_30_percent:
+                #     if this_week_vol / sum_10 < 1 / filter_10_percent:
+                #         if this_week_vol / sum_5 < 1 / filter_5_percent:
+                #             if this_week_vol / sum_3 < 1 / filter_3_percent:
+                indicator = this_week_vol / min8
+                if indicator < 1:
+                    tmp_data = pd.DataFrame([{
+                        'code': Utils.T2Bcode(row[0]),
+                        'name': stock_keys.loc[row[0]]['name'],
+                        'indicator': str(indicator),
+                        'market_capital': market_capital,
+                        'vol': this_week_vol
+                    }])
+                    bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data],
+                                         ignore_index=True)
+                # 进度条
+                print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
+            count = count + 1
+
+        Utils.saveCSVToCache(bk_table, 'get_weeks_low_vol_' + date)
+        return bk_table
+
+    @staticmethod
     def get_last_week_activity_index():
         date = time.strftime("%Y-%m-%d", time.localtime())
 
