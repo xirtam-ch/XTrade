@@ -41,6 +41,11 @@ class DataUpgrade:
             code = Utils.T2Bcode(row[0])
             result = utls.fetch(url.format(code, int(time.time() * 1000), 200))  # 200周k线
 
+            if result['data'] == {}:
+                print(f'{Utils.T2Bcode(row[0])} 没有数据')
+                count = count + 1
+                continue
+
             for item in result['data']['item']:
                 timestamp = item[0]
                 volume = item[1]
