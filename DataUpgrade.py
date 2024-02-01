@@ -2,7 +2,10 @@ import os
 
 import pandas as pd
 
+from C import C
 from Utils import Utils
+from pysnowball import utls
+import time
 
 
 class DataUpgrade:
@@ -12,6 +15,57 @@ class DataUpgrade:
         data = pro.stock_basic(exchange='', list_status='L', fields='ts_code,symbol,name,area,industry,list_date')
         Utils.saveToCSV(data, "stocks")
         print('stocks updated')
+
+    @staticmethod
+    def update_week_k_line():
+        if not os.path.exists(C.WEEK_KLINE_PATH):
+            os.mkdir(C.WEEK_KLINE_PATH)
+
+        date = time.strftime("%Y-%m-%d", time.localtime())
+        url = "https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol={}&begin={}&period=week&type=before&count=-{}&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance"
+        all_stock_keys = Utils.readFromCSV('stocks')
+        remove_bj = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
+        stock_keys = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
+        bk_table = pd.DataFrame(columns=['code', 'name'])
+
+        count = 1
+        for row in stock_keys.iterrows():
+            code = Utils.T2Bcode(row[0])
+            result = utls.fetch(url.format(code, int(time.time() * 1000), 200))  # 200周k线
+
+            for item in result['data']['item']:
+                timestamp = item[0]
+                volume = item[1]
+                open = item[2]
+                high = item[3]
+                low = item[4]
+                close = item[5]
+                percent = item[7]
+                turnoverrate = item[8] # 换手率
+                amount = item[9]
+                market_capital = item[16]
+
+                tmp_data = pd.DataFrame([{
+                    'timestamp': str(timestamp),
+                    # 'code': Utils.T2Bcode(row[0]),
+                    # 'name': stock_keys.loc[row[0]]['name'],
+                    'volume': str(volume),
+                    'open': str(open),
+                    'high': str(high),
+                    'low': str(low),
+                    'close': str(close),
+                    'percent': str(percent),
+                    'turnoverrate': str(turnoverrate),
+                    'amount': str(amount),
+                    'market_capital': market_capital
+                }])
+                bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data],
+                                     ignore_index=True)
+            # bk_table = bk_table.set_index('timestamp')
+            bk_table.to_csv(os.path.join(C.WEEK_KLINE_PATH + f'{Utils.T2Bcode(row[0])}_{date}' + '.csv'), index=False)
+            # 进度条
+            print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
+            count = count + 1
 
     @staticmethod
     def updateBK(ball):

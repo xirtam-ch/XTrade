@@ -46,5 +46,8 @@ if __name__ == '__main__':
     # print("### 西藏旅游股东人数")
     # print(pro.stk_holdernumber(ts_code='600749.SH', start_date='20180101', end_date=date))
 
-    df_stocks = AnalyzeData.get_two_day_kline()
-    print(df_stocks)
+    # df_stocks = AnalyzeData.get_days_kline()
+    # print(df_stocks)
+
+    # DataUpgrade.updateStocks(pro)
+    DataUpgrade.update_week_k_line()
