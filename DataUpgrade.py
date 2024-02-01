@@ -33,7 +33,9 @@ class DataUpgrade:
                 print(f'{Utils.T2Bcode(row[0])} 使用缓存')
                 continue
 
-            bk_table = pd.DataFrame(columns=['code', 'name'])
+            bk_table = pd.DataFrame(
+                columns=['timestamp', 'volume', 'open', 'high', 'low', 'close', 'percent', 'turnoverrate', 'amount',
+                         'market_capital'])
 
             code = Utils.T2Bcode(row[0])
             result = utls.fetch(url.format(code, int(time.time() * 1000), 200))  # 200周k线
@@ -46,7 +48,7 @@ class DataUpgrade:
                 low = item[4]
                 close = item[5]
                 percent = item[7]
-                turnoverrate = item[8] # 换手率
+                turnoverrate = item[8]  # 换手率
                 amount = item[9]
                 market_capital = item[16]
 
@@ -62,10 +64,9 @@ class DataUpgrade:
                     'percent': str(percent),
                     'turnoverrate': str(turnoverrate),
                     'amount': str(amount),
-                    'market_capital': market_capital
+                    'market_capital': str(market_capital)
                 }])
-                bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data],
-                                     ignore_index=True)
+                bk_table = pd.concat([bk_table, tmp_data], ignore_index=True)
 
             bk_table.to_csv(os.path.join(C.WEEK_KLINE_PATH + f'{Utils.T2Bcode(row[0])}_{date}' + '.csv'), index=False)
             # 进度条
@@ -108,7 +109,7 @@ class DataUpgrade:
                     'market_capital': quote['market_capital'],
                     'region': market['region'],
                 }])
-                bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
+                bk_table = pd.concat([bk_table, tmp_data], ignore_index=True)
 
             Utils.saveToCSV(bk_table, 'bk')
         print('BKs updated')

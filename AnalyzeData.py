@@ -90,7 +90,7 @@ class AnalyzeData:
                         'code': Utils.T2Bcode(row[0]),
                         'name': stock_keys.loc[row[0]]['name'],
                         'indicator': str(indicator),
-                        'market_capital': market_capital,
+                        'market_capital': str(market_capital),
                         'vol': this_week_vol
                     }])
                     bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data],
@@ -192,7 +192,7 @@ class AnalyzeData:
                     'last_week_amount': execWeekData[9],
                     'indicator': str(indicator),
                     'last_week_percent': execWeekData[7],
-                    'market_capital': market_capital,
+                    'market_capital': str(market_capital),
                     'price': result['data']['item'][4][5]  # 最新价格始终使用最后一周的
                 }])
                 bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
