@@ -44,6 +44,11 @@ class AnalyzeData:
             # 'pcf', 'market_capital', 'balance', 'hold_volume_cn', 'hold_ratio_cn',
             # 'net_volume_cn', 'hold_volume_hk', 'hold_ratio_hk', 'net_volume_hk']
 
+            if result['data'] == {}:
+                print(f'{Utils.T2Bcode(row[0])} 没有数据')
+                count = count + 1
+                continue
+
             if len(result['data']['item']) < MAX_WEEK_COUNT:  # 次新股排除
                 print(f'{code} 次新股排除')
                 continue
@@ -232,6 +237,11 @@ class AnalyzeData:
             # 'pcf', 'market_capital', 'balance', 'hold_volume_cn', 'hold_ratio_cn',
             # 'net_volume_cn', 'hold_volume_hk', 'hold_ratio_hk', 'net_volume_hk']
 
+            if result['data'] == {} or result['data']['item'] == {} or len(result['data']['item']) < 2:
+                print(f'{Utils.T2Bcode(row[0])} 没有数据')
+                count = count + 1
+                continue
+
             today_data = result['data']['item'][2]
             yestday_data = result['data']['item'][1]
             last2day_data = result['data']['item'][0]
@@ -261,7 +271,7 @@ class AnalyzeData:
                 'percent': today_data[7],
                 'market_capital': today_data[16]
             }])
-            bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data], ignore_index=True)
+            bk_table = pd.concat([bk_table, tmp_data], ignore_index=True)
             count = count + 1
 
         Utils.saveCSVToCache(bk_table, 'days_kline_' + date)
