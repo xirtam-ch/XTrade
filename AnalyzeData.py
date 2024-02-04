@@ -209,8 +209,25 @@ class AnalyzeData:
         return bk_table
 
     @staticmethod
-    def get_days_kline(timestamp=time.time()):
-        date = time.strftime("%Y-%m-%d", time.localtime(timestamp))
+    def get_days_kline(symbol, days):
+        data = []
+        url = "https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol={}&begin={}&period=day&type=before&count=-{}&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance"
+        result = utls.fetch(url.format(symbol, int(time.time() * 1000), days))
+        if result['data'] == {} or result['data']['item'] == {} or len(result['data']['item']) < days:
+            return []
+        else:
+
+            for i in range(0, days):
+                item = {'open': (result['data']['item'][i][2],), 'high': (result['data']['item'][i][3],),
+                        'low': (result['data']['item'][i][4],), 'close': (result['data']['item'][i][5],),
+                        'amount': (result['data']['item'][i][9],), 'percent': (result['data']['item'][i][7],),
+                        'market_capital': (result['data']['item'][i][16],)}
+                data.append(item)
+        return data  # r[0]['open'][0]
+
+    @staticmethod
+    def get_days_kline_all_stocks():
+        date = time.strftime("%Y-%m-%d", time.localtime())
 
         if os.path.exists(os.path.join(C.CACHE_PATH + 'days_kline_' + date + '.csv')):
             print(f'get_last_day_percent 使用缓存')
@@ -225,11 +242,11 @@ class AnalyzeData:
         bk_table = pd.DataFrame()
 
         count = 1
-        MAX_WEEK_COUNT = 3
+        MAX_DAYS_COUNT = 3
         # try:
         for row in stock_keys.iterrows():
             code = Utils.T2Bcode(row[0])
-            result = utls.fetch(url.format(code, int(time.time() * 1000), MAX_WEEK_COUNT))
+            result = utls.fetch(url.format(code, int(time.time() * 1000), MAX_DAYS_COUNT))
 
             # ['timestamp', 'volume', 'open', 'high', 'low',
             # 'close', 'chg', 'percent', 'turnoverrate', 'amount',

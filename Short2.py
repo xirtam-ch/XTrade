@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     # 今天
     date = time.strftime("%Y-%m-%d", time.localtime())
-    kline_data = AnalyzeData.get_days_kline()
+    kline_data = AnalyzeData.get_days_kline_all_stocks()
 
     # print(kline_data)
 
