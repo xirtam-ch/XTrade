@@ -1,4 +1,5 @@
 # coding: utf-8
+import math
 import os
 import time
 
@@ -11,7 +12,14 @@ from C import C
 class Utils:
 
     @staticmethod
-    def T2Bcode(code): ## 603102.SH -> SH603102
+    def is_daily_limit_up(code, last_close, price):  ## 603102.SH -> SH603102
+        daily_limit = 1.1
+        if code[2:4] == '30' or code[2:4] == '68':
+            daily_limit = 1.2
+        return math.floor(last_close * daily_limit * 100) / 100 == price
+
+    @staticmethod
+    def T2Bcode(code):  ## 603102.SH -> SH603102
         return code.split(".")[1] + code.split(".")[0]
 
     @staticmethod
