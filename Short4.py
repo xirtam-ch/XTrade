@@ -105,5 +105,5 @@ if __name__ == '__main__':
                                 subprocess.run(['say', item['symbol'] + '炸板'])
 
         print('执行一轮...')
-        time.sleep(3)
+        time.sleep(1)
     # subprocess.run(['say', '运行完毕，恭喜发财'])
