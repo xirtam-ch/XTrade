@@ -19,6 +19,10 @@ class Utils:
         return math.floor(last_close * daily_limit * 100) / 100 == price
 
     @staticmethod
+    def is_fried_board(symbol, last_close, price, high):  ## ex:SH603102
+        return Utils.is_daily_limit_up(symbol, last_close, high) & (price < high)
+
+    @staticmethod
     def T2Bcode(code):  ## 603102.SH -> SH603102
         return code.split(".")[1] + code.split(".")[0]
 
