@@ -13,7 +13,7 @@ class Utils:
 
     @staticmethod
     def is_daily_limit_up(symbol, last_close, price):  ## ex:SH603102
-        return Utils.get_daily_limit_price == price
+        return Utils.get_daily_limit_price(symbol, last_close) == price
 
     @staticmethod
     def get_daily_limit_price(symbol, last_close):  ## ex:SH603102
@@ -24,6 +24,8 @@ class Utils:
 
     @staticmethod
     def is_fried_board(symbol, last_close, price, high):  ## ex:SH603102
+        if price == None or high == None:
+            print(symbol)
         return Utils.is_daily_limit_up(symbol, last_close, high) & (price < high)
 
     @staticmethod
