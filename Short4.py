@@ -29,6 +29,9 @@ def prepare():
 if __name__ == '__main__':
     prepare()
 
+    black_list = []
+    noticed_list = []
+
     # 今天
     date = time.strftime("%Y-%m-%d", time.localtime())
     while True:
@@ -41,9 +44,6 @@ if __name__ == '__main__':
         count = 0
         group = 0
         groupLength = 300
-
-        black_list = []
-        noticed_list = []
 
         for row in bk_keys.iterrows():
             symbols_str = symbols_str + Utils.T2Bcode(row[0]) + ","
