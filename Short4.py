@@ -101,8 +101,10 @@ if __name__ == '__main__':
                                 AnalyzeData.get_days_kline(item['symbol'], review_days)[review_days - 3]['close'][0]
                             if not Utils.is_daily_limit_up(item['symbol'], last_last_close,
                                                            item['last_close']):  # 昨日未涨停
-                                print('首板炸板 ' + item['symbol'])
-                                subprocess.run(['say', item['symbol'] + '炸板'])
+                                if item['symbol'] not in noticed_list:
+                                    print('首板炸板 ' + item['symbol'])
+                                    noticed_list.append(item['symbol'])
+                                    subprocess.run(['say', item['symbol'] + '炸板'])
 
         print('执行一轮...')
         time.sleep(1)
