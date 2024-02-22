@@ -102,7 +102,7 @@ if __name__ == '__main__':
                             if not Utils.is_daily_limit_up(item['symbol'], last_last_close,
                                                            item['last_close']):  # 昨日未涨停
                                 if item['symbol'] not in noticed_list:
-                                    print('首板炸板 ' + item['symbol'])
+                                    print('首板炸板 ' + item['symbol'] +' '+bk_keys.loc[Utils.B2Tcode(item['symbol'])]['name'])
                                     noticed_list.append(item['symbol'])
                                     subprocess.run(['say', item['symbol'] + '炸板'])
 
