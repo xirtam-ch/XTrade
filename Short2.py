@@ -61,20 +61,24 @@ if __name__ == '__main__':
     index = 1
     for table_index, row in filtered_df.iterrows():
         # 获取 DataFrame 中的相关数据
+
         code = row['code']
-        name = row['name']
-        price = row['close']
-        indicator = abs(
-            (row['last_close'] - row['last_low']) / (row['last_open'] - row['last_close']) - 0.382) + abs(
-            (row['high'] - row['close']) / (row['close'] - row['open']) - 0.382)
-        # if indicator < 0.3: #
-        # print(sheet)
-        # 将数据填充到 Excel 文件中的相应列
-        name_cell = sheet.cell(row=index + 1, column=1, value=f'{name} {str(code)}')
-        name_cell.hyperlink = f'https://xueqiu.com/S/{code}'
-        sheet.cell(row=index + 1, column=2, value=round(float(indicator), 2))
-        sheet.cell(row=index + 1, column=3, value=price)
-        index = index + 1
+        volume_ratio = AnalyzeData.get_stock_detail(ball, code).iloc[0,]['volume_ratio']
+        if 0.6 < volume_ratio < 1:  # 量比在0.6到1之间
+            name = row['name']
+            print(code, name)
+            price = row['close']
+            indicator = abs(
+                (row['last_close'] - row['last_low']) / (row['last_open'] - row['last_close']) - 0.382) + abs(
+                (row['high'] - row['close']) / (row['close'] - row['open']) - 0.382)
+            # if indicator < 0.3: #
+            # print(sheet)
+            # 将数据填充到 Excel 文件中的相应列
+            name_cell = sheet.cell(row=index + 1, column=1, value=f'{name} {str(code)}')
+            name_cell.hyperlink = f'https://xueqiu.com/S/{code}'
+            sheet.cell(row=index + 1, column=2, value=round(float(indicator), 2))
+            sheet.cell(row=index + 1, column=3, value=price)
+            index = index + 1
 
     # # 保存修改后的 Excel 文件
     wb.save(f'{C.XLS_OUTPUT_PATH}short2_{date}.xlsx')
