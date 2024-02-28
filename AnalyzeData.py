@@ -17,6 +17,21 @@ from Utils import Utils
 class AnalyzeData:
 
     @staticmethod
+    def get_stock_detail(ball, code):
+        bk = ball.quote_detail(code)
+        quote = bk['data']['quote']
+        market = bk['data']['market']
+        tmp_data = pd.DataFrame([{
+            'code': code,
+            'name': quote['name'],
+            'price': quote['current'],
+            'date': quote['time'],
+            'volume_ratio': quote['volume_ratio'],
+            'market_capital': quote['market_capital'],
+            'region': market['region'],
+        }])
+        return tmp_data
+    @staticmethod
     def get_weeks_low_vol(weeks=30):
         date = time.strftime("%Y-%m-%d", time.localtime())
 
