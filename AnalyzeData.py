@@ -236,7 +236,12 @@ class AnalyzeData:
         url = "https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol={}&begin={}&period=day&type=before&count=-{}&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance"
         all_stock_keys = Utils.readFromCSV('stocks')  # stocks_test
         remove_bj = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
-        stock_keys = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
+        remove_st = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
+
+        remove_st.loc[:, 'list_date'] = pd.to_datetime(remove_st['list_date'], format='%Y%m%d')  # 排除上市不足一年
+        one_year_ago = pd.Timestamp(date) - pd.DateOffset(years=1)
+        filter_one_year = remove_st['list_date'] <= one_year_ago
+        stock_keys = remove_st.loc[filter_one_year]
 
         # 制表保存
         bk_table = pd.DataFrame()

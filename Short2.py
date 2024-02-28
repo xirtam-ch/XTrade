@@ -33,41 +33,24 @@ if __name__ == '__main__':
 
     # print(kline_data)
 
-    # 筛选数据，小市值
-    # filtered_df = kline_data[kline_data['market_capital'] < 200 * 10000 * 10000]
-    # print(f'小市值{filtered_df.shape[0]}')
+    # 市值100-1000亿
+    filtered_df = kline_data[kline_data['market_capital'] > 100 * 10000 * 10000]
+    print(f'市值>100亿 {filtered_df.shape[0]}')
+    filtered_df = filtered_df[filtered_df['market_capital'] < 1000 * 10000 * 10000]
+    print(f'市值<1000亿 {filtered_df.shape[0]}')
 
-    # 筛选数据，昨日跌过
-    # filtered_df = filtered_df[filtered_df['last_open'] / filtered_df['last_low'] > 1.02]
-    # print(f'昨日跌过{filtered_df.shape[0]}')
-
-    # 筛选数据，今日红
-    filtered_df = kline_data[(kline_data['close'] / kline_data['open']) > 1.01]
-    print(f'今日红{filtered_df.shape[0]}')
-
-    # 筛选数据，昨日绿
-    filtered_df = filtered_df[filtered_df['last_open'] / filtered_df['last_close'] > 1.01]
-    print(f'昨日绿{filtered_df.shape[0]}')
-    #
-    # 筛选数据，今日上影
-    filtered_df = filtered_df[filtered_df['high'] / filtered_df['close'] > 1]
-    print(f'今日上影{filtered_df.shape[0]}')
+    # 成交额>3亿
+    filtered_df = filtered_df[filtered_df['last_amount'] > 3 * 10000 * 10000]
+    print(f'成交额>3亿 {filtered_df.shape[0]}')
 
     # 筛选数据，昨日下影
-    filtered_df = filtered_df[filtered_df['last_close'] / filtered_df['last_low'] > 1]
-    print(f'昨日下影{filtered_df.shape[0]}')
-
-    # 筛选数据，放量
-    filtered_df = filtered_df[filtered_df['amount'] / filtered_df['last_amount'] > 1]
-    print(f'放量{filtered_df.shape[0]}')
-
-    # 筛选数据，高开
-    filtered_df = filtered_df[filtered_df['open'] / filtered_df['last_close'] > 1]
-    print(f'高开{filtered_df.shape[0]}')
-
-    # 筛选数据，跳开
-    filtered_df = filtered_df[filtered_df['close'] / filtered_df['last_open'] > 1]
-    print(f'跳开{filtered_df.shape[0]}')
+    filtered_df = filtered_df[filtered_df['last_low'] / filtered_df['last2_close'] - 1 < -0.04]
+    filtered_df = filtered_df[-0.05 < filtered_df['last_low'] / filtered_df['last2_close'] - 1]
+    print(f'下影 {filtered_df.shape[0]}')
+    # 筛选数据，昨日上影
+    filtered_df = filtered_df[0.02 < filtered_df['last_high'] / filtered_df['last2_close'] - 1]
+    filtered_df = filtered_df[filtered_df['last_high'] / filtered_df['last2_close'] - 1 < 0.03]
+    print(f'上影 {filtered_df.shape[0]}')
 
     filtered_df = filtered_df.reset_index()
 
