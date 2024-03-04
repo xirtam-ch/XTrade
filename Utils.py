@@ -2,6 +2,7 @@
 import math
 import os
 import time
+from decimal import Decimal, ROUND_HALF_UP
 
 import numpy as np
 import pandas as pd
@@ -20,7 +21,8 @@ class Utils:
         daily_limit = 1.1
         if symbol[2:4] == '30' or symbol[2:4] == '68':
             daily_limit = 1.2
-        return round(last_close * daily_limit, 2)
+        return Decimal(str(last_close * daily_limit)).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+        # return round(last_close * daily_limit, 2)
 
     @staticmethod
     def get_daily_limit_percent(symbol):  ## ex:SH603102
