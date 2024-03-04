@@ -93,20 +93,19 @@ if __name__ == '__main__':
             # 	'yield_to_maturity': None
             # }
             for item in data['data']:
-                if Utils.get_daily_limit_price(item['symbol'], item['last_close']) != item['open']:  # 非开盘涨停
-                    if item['is_trade']:  # if item['high'] is not None:
-                        if Utils.is_fried_board(item['symbol'], item['last_close'], item['current'],
-                                                item['high']):  # 炸板
-                            # print(f'炸板 ' + item['symbol'])
-                            review_days = 10
-                            last_last_close = \
-                                AnalyzeData.get_days_kline(item['symbol'], review_days)[review_days - 3]['close'][0]
-                            if not Utils.is_daily_limit_up(item['symbol'], last_last_close,
-                                                           item['last_close']):  # 昨日未涨停
-                                if item['symbol'] not in noticed_list:
-                                    print('首板炸板 ' + item['symbol'][2:] +' '+bk_keys.loc[Utils.B2Tcode(item['symbol'])]['name'])
-                                    noticed_list.append(item['symbol'])
-                                    subprocess.run(['say', '-r', '150', ' '.join(item['symbol'][2:])])
+                if item['is_trade']:  # if item['high'] is not None:
+                    if Utils.is_fried_board(item['symbol'], item['last_close'], item['current'],
+                                            item['high']):  # 炸板
+                        # print(f'炸板 ' + item['symbol'])
+                        review_days = 10
+                        last_last_close = \
+                            AnalyzeData.get_days_kline(item['symbol'], review_days)[review_days - 3]['close'][0]
+                        if not Utils.is_daily_limit_up(item['symbol'], last_last_close,
+                                                       item['last_close']):  # 昨日未涨停
+                            if item['symbol'] not in noticed_list:
+                                print('首板炸板 ' + item['symbol'][2:] +' '+bk_keys.loc[Utils.B2Tcode(item['symbol'])]['name'])
+                                noticed_list.append(item['symbol'])
+                                subprocess.run(['say', '-r', '150', ' '.join(item['symbol'][2:])])
 
         print('执行一轮...')
         time.sleep(1)
