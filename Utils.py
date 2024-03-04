@@ -21,7 +21,7 @@ class Utils:
         daily_limit = 1.1
         if symbol[2:4] == '30' or symbol[2:4] == '68':
             daily_limit = 1.2
-        return Decimal(str(last_close * daily_limit)).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+        return float(Decimal(str(last_close * daily_limit)).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
         # return round(last_close * daily_limit, 2)
 
     @staticmethod
