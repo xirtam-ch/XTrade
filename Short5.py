@@ -66,7 +66,7 @@ if __name__ == '__main__':
                     if Utils.get_daily_limit_price(item['symbol'], item['last_close']) != item[
                         'current']:  # 非涨停
                         if item['is_trade']:  # if item['high'] is not None:
-                            if item['current'] >= math.floor(item['last_close'] * 1.09 * 100) / 100:
+                            if item['current'] >= math.floor(item['last_close'] * Utils.get_daily_limit_percent(item['symbol']) * 0.99 * 100) / 100:
                                 review_days = 10
                                 last_last_close = \
                                     AnalyzeData.get_days_kline(item['symbol'], review_days)[review_days - 3]['close'][0]
