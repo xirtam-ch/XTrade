@@ -61,23 +61,22 @@ if __name__ == '__main__':
         for i in range(0, group):
             data = ball.quotec(symbols[i])
             for item in data['data']:
-                if item['symbol'][2:] == '000801':
+                if Utils.get_daily_limit_price(item['symbol'], item['last_close']) != item[
+                    'open']:  # 非开盘涨停
                     if Utils.get_daily_limit_price(item['symbol'], item['last_close']) != item[
-                        'open']:  # 非开盘涨停
-                        if Utils.get_daily_limit_price(item['symbol'], item['last_close']) != item[
-                            'current']:  # 非涨停
-                            if item['is_trade']:  # if item['high'] is not None:
-                                if item['current'] >= math.floor(item['last_close'] * 1.09 * 100) / 100:
-                                    review_days = 10
-                                    last_last_close = \
-                                        AnalyzeData.get_days_kline(item['symbol'], review_days)[review_days - 3]['close'][0]
-                                    if not Utils.is_daily_limit_up(item['symbol'], last_last_close,
-                                                                   item['last_close']):  # 昨日未涨停
-                                        if item['symbol'] not in noticed_list:
-                                            print('涨9 ' + item['symbol'][2:] + ' ' +
-                                                  bk_keys.loc[Utils.B2Tcode(item['symbol'])]['name'])
-                                            noticed_list.append(item['symbol'])
-                                            subprocess.run(['say', item['symbol'][2:]])
+                        'current']:  # 非涨停
+                        if item['is_trade']:  # if item['high'] is not None:
+                            if item['current'] >= math.floor(item['last_close'] * 1.09 * 100) / 100:
+                                review_days = 10
+                                last_last_close = \
+                                    AnalyzeData.get_days_kline(item['symbol'], review_days)[review_days - 3]['close'][0]
+                                if not Utils.is_daily_limit_up(item['symbol'], last_last_close,
+                                                               item['last_close']):  # 昨日未涨停
+                                    if item['symbol'] not in noticed_list:
+                                        print('涨9 ' + item['symbol'][2:] + ' ' +
+                                              bk_keys.loc[Utils.B2Tcode(item['symbol'])]['name'])
+                                        noticed_list.append(item['symbol'])
+                                        subprocess.run(['say', item['symbol'][2:]])
 
         print('执行一轮...')
         time.sleep(1)
