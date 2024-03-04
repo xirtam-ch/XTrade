@@ -20,7 +20,14 @@ class Utils:
         daily_limit = 1.1
         if symbol[2:4] == '30' or symbol[2:4] == '68':
             daily_limit = 1.2
-        return round(last_close * daily_limit * 100) / 100
+        return round(last_close * daily_limit, 2)
+
+    @staticmethod
+    def get_daily_limit_percent(symbol):  ## ex:SH603102
+        daily_limit = 1.1
+        if symbol[2:4] == '30' or symbol[2:4] == '68':
+            daily_limit = 1.2
+        return daily_limit
 
     @staticmethod
     def is_fried_board(symbol, last_close, price, high):  ## ex:SH603102
