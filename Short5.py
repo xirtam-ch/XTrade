@@ -76,7 +76,7 @@ if __name__ == '__main__':
                                         print('涨9 ' + item['symbol'][2:] + ' ' +
                                               bk_keys.loc[Utils.B2Tcode(item['symbol'])]['name'])
                                         noticed_list.append(item['symbol'])
-                                        subprocess.run(['say', item['symbol'][2:]])
+                                        subprocess.run(['say', '-r', '150', ' '.join(item['symbol'][2:])])
 
         print('执行一轮...')
         time.sleep(1)
