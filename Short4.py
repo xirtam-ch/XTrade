@@ -37,7 +37,9 @@ if __name__ == '__main__':
     while True:
         date = time.strftime("%Y-%m-%d", time.localtime())
 
-        bk_keys = Utils.readFromCSV('stocks')
+        all_stock_keys = Utils.readFromCSV('stocks')
+        remove_bj = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
+        bk_keys = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
 
         symbols = []
         symbols_str = ''
