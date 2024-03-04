@@ -20,7 +20,7 @@ class Utils:
         daily_limit = 1.1
         if symbol[2:4] == '30' or symbol[2:4] == '68':
             daily_limit = 1.2
-        return math.floor(last_close * daily_limit * 100) / 100
+        return round(last_close * daily_limit * 100) / 100
 
     @staticmethod
     def is_fried_board(symbol, last_close, price, high):  ## ex:SH603102
