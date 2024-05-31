@@ -40,16 +40,16 @@ if __name__ == '__main__':
     print(f'市值<1000亿 {filtered_df.shape[0]}')
 
     # 成交额>3亿
-    filtered_df = filtered_df[filtered_df['last_amount'] > 3 * 10000 * 10000]
+    filtered_df = filtered_df[filtered_df['amount'] > 3 * 10000 * 10000]
     print(f'成交额>3亿 {filtered_df.shape[0]}')
 
-    # 筛选数据，昨日下影
-    filtered_df = filtered_df[filtered_df['last_low'] / filtered_df['last2_close'] - 1 < -0.04]
-    filtered_df = filtered_df[-0.05 < filtered_df['last_low'] / filtered_df['last2_close'] - 1]
+    # 今日下影
+    filtered_df = filtered_df[filtered_df['low'] / filtered_df['last_close'] - 1 < -0.04]
+    filtered_df = filtered_df[-0.05 < filtered_df['low'] / filtered_df['last_close'] - 1]
     print(f'下影 {filtered_df.shape[0]}')
-    # 筛选数据，昨日上影
-    filtered_df = filtered_df[0.02 < filtered_df['last_high'] / filtered_df['last2_close'] - 1]
-    filtered_df = filtered_df[filtered_df['last_high'] / filtered_df['last2_close'] - 1 < 0.03]
+    # 今日上影
+    filtered_df = filtered_df[0.02 < filtered_df['high'] / filtered_df['last_close'] - 1]
+    filtered_df = filtered_df[filtered_df['high'] / filtered_df['last_close'] - 1 < 0.03]
     print(f'上影 {filtered_df.shape[0]}')
 
     filtered_df = filtered_df.reset_index()
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     wb = openpyxl.load_workbook('module.xlsx')
     # 选择要操作的工作表
     sheet = wb.active  # 或者使用 workbook['Sheet1'] 选择特定的工作表
-
+    print(f' {filtered_df}')
     index = 1
     for table_index, row in filtered_df.iterrows():
         # 获取 DataFrame 中的相关数据
