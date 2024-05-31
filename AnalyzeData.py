@@ -88,6 +88,7 @@ class AnalyzeData:
                 sum_3 = 0
 
                 min8 = 2099999999  # 几周内最小成交额
+                max8 = -1  # 几周内最大成交额
 
                 for i in range(0, weeks):
                     if i >= weeks - 3:
@@ -99,15 +100,19 @@ class AnalyzeData:
                     if i >= weeks - 30:
                         sum_30 = sum_30 + result['data']['item'][i][9]
                     if i < weeks - 1:
-                        if result['data']['item'][i][1] < min8:
+                        if result['data']['item'][i][9] < min8:
                             min8 = result['data']['item'][i][9]
+                        if result['data']['item'][i][9] > max8:
+                            max8 = result['data']['item'][i][9]
                 # 计算指标
                 # if this_week_vol / sum_30 < 1 / filter_30_percent:
                 #     if this_week_vol / sum_10 < 1 / filter_10_percent:
                 #         if this_week_vol / sum_5 < 1 / filter_5_percent:
                 #             if this_week_vol / sum_3 < 1 / filter_3_percent:
-                indicator = this_week_vol / min8
-                if indicator < 1:  # 本周成交额 未超过 几周内最低成交额，缩量
+
+                indicator = this_week_vol / min8 + this_week_vol / max8
+
+                if indicator > 1.5:  # 本周成交额 超过 几周内最低成交额
                     if abs(this_week_percent) < 0.02:  # 周涨跌幅小于2%，接近横盘
                         tmp_data = pd.DataFrame([{
                             'code': Utils.T2Bcode(row[0]),
