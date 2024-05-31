@@ -110,9 +110,9 @@ class AnalyzeData:
                 #         if this_week_vol / sum_5 < 1 / filter_5_percent:
                 #             if this_week_vol / sum_3 < 1 / filter_3_percent:
 
-                indicator = this_week_vol / min8 + this_week_vol / max8
+                indicator = max8 / min8  # 描述成交量缩量程度
 
-                if indicator > 1.5:  # 本周成交额 超过 几周内最低成交额
+                if this_week_vol / min8 < 1.2:  # 本周成交额接近最小
                     if abs(this_week_percent) < 0.02:  # 周涨跌幅小于2%，接近横盘
                         tmp_data = pd.DataFrame([{
                             'code': Utils.T2Bcode(row[0]),
