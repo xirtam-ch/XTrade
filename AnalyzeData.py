@@ -31,8 +31,9 @@ class AnalyzeData:
             'region': market['region'],
         }])
         return tmp_data
+
     @staticmethod
-    def get_weeks_low_vol(weeks=30):
+    def get_weeks_low_vol(weeks=5):
         date = time.strftime("%Y-%m-%d", time.localtime())
 
         # if os.path.exists(os.path.join(C.CACHE_PATH + 'get_weeks_low_vol_' + date + '.csv')):
@@ -78,43 +79,45 @@ class AnalyzeData:
                 filter_5_percent = filter_30_percent / 6
                 filter_3_percent = filter_30_percent / 10
 
-                this_week_vol = result['data']['item'][weeks - 1][1]
+                this_week_vol = result['data']['item'][weeks - 1][9]
+                this_week_percent = result['data']['item'][weeks - 1][7]
 
                 sum_30 = 0
                 sum_10 = 0
                 sum_5 = 0
                 sum_3 = 0
 
-                min8 = 2099999999
+                min8 = 2099999999  # 几周内最小成交额
 
                 for i in range(0, weeks):
                     if i >= weeks - 3:
-                        sum_3 = sum_3 + result['data']['item'][i][1]
+                        sum_3 = sum_3 + result['data']['item'][i][9]
                     if i >= weeks - 5:
-                        sum_5 = sum_5 + result['data']['item'][i][1]
+                        sum_5 = sum_5 + result['data']['item'][i][9]
                     if i >= weeks - 10:
-                        sum_10 = sum_10 + result['data']['item'][i][1]
+                        sum_10 = sum_10 + result['data']['item'][i][9]
                     if i >= weeks - 30:
-                        sum_30 = sum_30 + result['data']['item'][i][1]
+                        sum_30 = sum_30 + result['data']['item'][i][9]
                     if i < weeks - 1:
                         if result['data']['item'][i][1] < min8:
-                            min8 = result['data']['item'][i][1]
+                            min8 = result['data']['item'][i][9]
                 # 计算指标
                 # if this_week_vol / sum_30 < 1 / filter_30_percent:
                 #     if this_week_vol / sum_10 < 1 / filter_10_percent:
                 #         if this_week_vol / sum_5 < 1 / filter_5_percent:
                 #             if this_week_vol / sum_3 < 1 / filter_3_percent:
                 indicator = this_week_vol / min8
-                if indicator < 1:
-                    tmp_data = pd.DataFrame([{
-                        'code': Utils.T2Bcode(row[0]),
-                        'name': stock_keys.loc[row[0]]['name'],
-                        'indicator': str(indicator),
-                        'market_capital': str(market_capital),
-                        'vol': this_week_vol
-                    }])
-                    bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data],
-                                         ignore_index=True)
+                if indicator < 1:  # 本周成交额 未超过 几周内最低成交额，缩量
+                    if abs(this_week_percent) < 0.02:  # 周涨跌幅小于2%，接近横盘
+                        tmp_data = pd.DataFrame([{
+                            'code': Utils.T2Bcode(row[0]),
+                            'name': stock_keys.loc[row[0]]['name'],
+                            'indicator': str(indicator),
+                            'market_capital': str(market_capital),
+                            'vol': this_week_vol
+                        }])
+                        bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data],
+                                             ignore_index=True)
                 # 进度条
                 print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
             count = count + 1
