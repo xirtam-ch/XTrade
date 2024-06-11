@@ -14,15 +14,21 @@ from openpyxl.formula.translate import Translator
 import pysnowball as ball
 import subprocess;
 
+from DataUpgrade import DataUpgrade
+import tushare as ts
 
 def prepare():
-    if not os.path.exists(C.DATA_PATH):
-        os.mkdir(C.DATA_PATH)
     config = ConfigParser()
     config.read('token.config')
-
+    pro = ts.pro_api(config.get('token', 'tushare'))
     ball.set_token(config.get('token', 'xueqiu'))  # xq_a_token=XXXX
 
+    if not os.path.exists(C.DATA_PATH):
+        os.mkdir(C.DATA_PATH)
+
+        # 更新基础数据
+        DataUpgrade.updateBK(ball)
+        DataUpgrade.updateStocks(pro)
 
 if __name__ == '__main__':
     prepare()
