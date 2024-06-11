@@ -150,7 +150,8 @@ class AnalyzeData:
         MAX_WEEK_COUNT = weeks
         for row in stock_keys.iterrows():
             code = Utils.T2Bcode(row[0])
-            result = utls.fetch(url.format(code, int(time.time() * 1000 - 72 * 3600 * 1000), MAX_WEEK_COUNT))
+            result = utls.fetch(url.format(code, int(time.time() * 1000), MAX_WEEK_COUNT))
+            # result = utls.fetch(url.format(code, int(time.time() * 1000 - 72 * 3600 * 1000), MAX_WEEK_COUNT))
 
             if result['data'] == {}:
                 print(f'{Utils.T2Bcode(row[0])} 没有数据')
