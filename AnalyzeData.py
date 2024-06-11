@@ -131,6 +131,74 @@ class AnalyzeData:
         return bk_table
 
     @staticmethod
+    def get_weeks_trends(weeks=7):
+        date = time.strftime("%Y-%m-%d", time.localtime())
+
+        # if os.path.exists(os.path.join(C.CACHE_PATH + 'get_weeks_low_vol_' + date + '.csv')):
+        #     print(f'get_last_week_activity_index 使用缓存')
+        #     return Utils.readCSVFromCache('get_weeks_low_vol_' + date)
+
+        url = "https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol={}&begin={}&period=week&type=before&count=-{}&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance"
+        all_stock_keys = Utils.readFromCSV('stocks')
+        remove_bj = all_stock_keys[~all_stock_keys.index.str.contains('BJ')]  # 排除北郊所，减少请求次数
+        stock_keys = remove_bj[~(remove_bj.name.str.contains('ST'))]  # 排除ST股，减少请求次数
+
+        # 制表保存
+        bk_table = pd.DataFrame(columns=['code', 'name', 'last_week_amount', 'indicator', 'last_week_percent', 'price'])
+
+        count = 1
+        MAX_WEEK_COUNT = weeks
+        for row in stock_keys.iterrows():
+            code = Utils.T2Bcode(row[0])
+            result = utls.fetch(url.format(code, int(time.time() * 1000 - 72 * 3600 * 1000), MAX_WEEK_COUNT))
+
+            if result['data'] == {}:
+                print(f'{Utils.T2Bcode(row[0])} 没有数据')
+                count = count + 1
+                continue
+
+            if len(result['data']['item']) < MAX_WEEK_COUNT:  # 次新股排除
+                print(f'{code} 次新股排除')
+                continue
+
+            market_capital = result['data']['item'][4][16]
+
+            if market_capital is None:  # 获取不到市值
+                print(f'{code} 获取不到市值')
+            else:
+                indicator = 1
+                for i in range(0, weeks - 1):
+                    m = result['data']['item'][i][9]
+                    # print(f'第{i}周成交额：{m}')
+                    m = result['data']['item'][i][9]
+                    # print(f'第{i}周成交额：{m}')
+                    rate = result['data']['item'][i + 1][9] / result['data']['item'][i][9]
+                    if rate < 1:
+                        rate = rate * rate
+                    indicator = indicator * rate
+
+                    # indicator = indicator * ((result['data']['item'][i + 1][9] / result['data']['item'][i][9]) ** 2)
+
+                # print(f'indicator：{indicator}')
+                tmp_data = pd.DataFrame([{
+                    'code': Utils.T2Bcode(row[0]),
+                    'name': stock_keys.loc[row[0]]['name'],
+                    'indicator': str(indicator),
+                    'market_capital': str(market_capital),
+                }])
+                bk_table = pd.concat([bk_table if not bk_table.empty else None, tmp_data],
+                                     ignore_index=True)
+                # 进度条
+                print(f'{round(count / stock_keys.shape[0] * 100, 2)}%, {row[0]}')
+
+                # if count / stock_keys.shape[0] * 100 > 1:
+                #     break
+            count = count + 1
+
+        Utils.saveCSVToCache(bk_table, 'get_weeks_low_vol_' + date)
+        return bk_table
+
+    @staticmethod
     def get_last_week_activity_index():
         date = time.strftime("%Y-%m-%d", time.localtime())
 
